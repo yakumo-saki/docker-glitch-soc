@@ -1,9 +1,5 @@
 FROM ruby:2.6-alpine
 
-# Copy over all the langs needed for runtime
-#COPY --from=build-dep /opt/node /opt/node
-#COPY --from=build-dep /opt/jemalloc /opt/jemalloc
-
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 
@@ -14,17 +10,6 @@ RUN apk add --no-cache whois nodejs yarn ca-certificates git bash \
     update-ca-certificates && \
     ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
  
-# install required packages
-#RUN echo "Etc/UTC" > /etc/localtime && \
-#       apt update && apt install -y --no-install-recommends \
-#          libpq-dev libprotobuf-dev protobuf-compiler \
-#          libssl1.1 libpq5 imagemagick ffmpeg \
-#          libprotobuf10 libidn11 libyaml-0-2 \
-#          file ca-certificates tzdata libreadline7 \
-#          libicu-dev libidn11-dev \
-#          libpq-dev libprotobuf-dev protobuf-compiler \
-#          curl whois libjemalloc1
-
 # Create the mastodon user
 ARG UID=991
 ARG GID=991
@@ -32,15 +17,6 @@ RUN echo "Etc/UTC" > /etc/localtime && \
 	addgroup --gid $GID mastodon && \
         adduser -D -u 991 -G mastodon -h /opt/mastodon mastodon && \
 	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
-
-#useradd -m -u $UID -g $GID -d /opt/mastodon mastodon && \
-
-# Add tini
-#ENV TINI_VERSION="0.18.0"
-#ENV TINI_SUM="12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855"
-#ADD https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini /tini
-#RUN echo "$TINI_SUM  tini" | sha256sum -c -
-#RUN chmod +x /tini
 
 # add dumb-init
 ENV INIT_VER="1.2.2"
@@ -69,10 +45,6 @@ USER mastodon
 
 # Tell rails to serve static files
 ENV RAILS_SERVE_STATIC_FILES="true"
-
-# enable jemalloc ( jemalloc not work with alpine )
-#ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
-
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
