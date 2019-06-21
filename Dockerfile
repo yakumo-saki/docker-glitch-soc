@@ -6,8 +6,8 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 RUN apk add --no-cache whois nodejs yarn ca-certificates git bash \
         gcc g++ make libc-dev file \
         imagemagick protobuf-dev libpq ffmpeg icu-dev libidn-dev yaml-dev \
-        readline-dev postgresql-dev && \
-    update-ca-certificates && \
+        readline-dev postgresql-dev curl && \
+        update-ca-certificates && \
     ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
  
 # Create the mastodon user
