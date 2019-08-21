@@ -53,7 +53,8 @@ COPY --chown=mastodon:mastodon . /opt/mastodon
 RUN cd ~ && \
     yarn install --pure-lockfile && \
     yarn cache clean && \
-    OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile
+    OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile && \
+    mkdir /opt/mastodon/public/override
 
 # Set the work dir and the container entry point
 WORKDIR /opt/mastodon
