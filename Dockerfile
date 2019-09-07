@@ -9,7 +9,7 @@ RUN apk add --no-cache whois nodejs yarn ca-certificates git bash \
         readline-dev postgresql-dev curl && \
         update-ca-certificates && \
     ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
- 
+
 # Create the mastodon user
 ARG UID=991
 ARG GID=991
@@ -26,7 +26,8 @@ RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
 RUN chmod +x /dumb-init
 
 # Copy over mastodon source, and dependencies from building, and set permissions
-COPY Gemfile* /opt/mastodon/
+ADD https://raw.githubusercontent.com/glitch-soc/mastodon/master/Gemfile /opt/mastodon/Gemfile
+ADD https://raw.githubusercontent.com/glitch-soc/mastodon/master/Gemfile.lock /opt/mastodon/Gemfile.lock
 
 # Run mastodon services in prod mode
 ENV RAILS_ENV="production"
@@ -39,6 +40,14 @@ RUN ln -s /opt/mastodon /mastodon && \
 
 RUN cd /opt/mastodon && \
         bundle install -j$(nproc) --deployment --without development test
+
+# git clone all sources
+# and modify version
+RUN cd /opt & \\
+        git clone --depth 1 https://github.com/glitch-soc/mastodon.git glitch && \
+	mv glitch/* /opt/mastodon/ && \
+	sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/" && \
+	chown -R mastodon:mastodon /opt/mastodon
 
 # Set the run user
 USER mastodon
