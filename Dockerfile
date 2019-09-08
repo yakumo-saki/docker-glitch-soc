@@ -28,13 +28,9 @@ ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_$
 RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
 RUN chmod +x /dumb-init
 
-# Copy over mastodon source, and dependencies from building, and set permissions
+# Get gemfile from mastodon source
 ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile /opt/mastodon/Gemfile
 ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/mastodon/Gemfile.lock
-
-# Run mastodon services in prod mode
-ENV RAILS_ENV="production"
-ENV NODE_ENV="production"
 
 # Install mastodon runtime deps
 RUN ln -s /opt/mastodon /mastodon && \
