@@ -46,7 +46,8 @@ RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch 
       cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
       sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
       mkdir /opt/mastodon/public/override && \
-      chown -R mastodon:mastodon /opt/mastodon
+      chown -R mastodon:mastodon /opt/mastodon && \
+      mkdir /home/mastodon && chown -R mastodon:mastodon /home/mastodon
 
 # Set the run user
 USER mastodon
