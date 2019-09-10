@@ -51,16 +51,19 @@ RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch 
 # Set the run user
 USER mastodon
 
+# Set the work dir and the container entry point
+WORKDIR /opt/mastodon
+
 # Tell rails to serve static files
 ENV RAILS_SERVE_STATIC_FILES="true"
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
-RUN cd && \
+RUN cd /opt/mastodon && \
       yarn install --pure-lockfile && \
-      yarn cache clean 
-RUN cd && OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rake assets:precompile
+      yarn cache clean
+RUN cd /opt/mastodon && \
+      OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder \
+      bundle exec rake assets:precompile
 
-# Set the work dir and the container entry point
-WORKDIR /opt/mastodon
 ENTRYPOINT ["/dumb-init", "--"]
