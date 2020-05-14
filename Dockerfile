@@ -1,4 +1,6 @@
-FROM ruby:2.6-alpine
+FROM ruby:2.6
+
+ENV NODE_VER="12.16.3"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
@@ -6,20 +8,48 @@ ENV GITHUB_REPO=glitch-soc/mastodon
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 
-RUN apk add --no-cache whois nodejs yarn ca-certificates git bash \
-        gcc g++ make libc-dev file sed \
-        imagemagick protobuf-dev libpq ffmpeg icu-dev libidn-dev yaml-dev \
-        readline-dev postgresql-dev curl && \
-        update-ca-certificates && \
-    ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
+# whois contains mkpasswd
+RUN echo "*** phase 1 install nodejs" && \
+    apt-get update && \
+    apt-get -y install wget python whois \
+                       git libicu-dev libidn11-dev \
+                       libpq-dev libprotobuf-dev protobuf-compiler && \
+    apt-get clean && \
+    cd ~ && \
+    wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-x64.tar.gz && \
+    tar xf node-v$NODE_VER-linux-x64.tar.gz && \
+    rm node-v$NODE_VER-linux-x64.tar.gz && \
+    mv node-v$NODE_VER-linux-x64 /opt/node  
+
+# Install jemalloc
+ENV JE_VER="5.2.1"
+#RUN echo "*** Compile jemalloc" && \
+#    apt-get update && \
+#    apt-get -y install make autoconf gcc g++ && \
+#    cd ~ && \
+#    wget -q https://github.com/jemalloc/jemalloc/archive/$JE_VER.tar.gz && \
+#    tar xf $JE_VER.tar.gz && \
+#    cd jemalloc-$JE_VER && \
+#    ./autogen.sh && \
+#    ./configure --prefix=/opt/jemalloc && \
+#    make -j$(nproc) > /dev/null && \
+#    make install_bin install_include install_lib
+
+# install node.js
+RUN echo "*** install yarn, bundler etc..." && \
+    npm install -g yarn && \
+    gem install bundler && \
+    echo "done"
 
 # Create the mastodon user
 ARG UID=991
 ARG GID=991
 RUN echo "Etc/UTC" > /etc/localtime && \
-	addgroup --gid $GID mastodon && \
-        adduser -D -u 991 -G mastodon -h /opt/mastodon mastodon && \
-	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
+    echo "not exec ln -s /opt/jemalloc/lib/* /usr/lib/" && \
+    addgroup --gid $GID mastodon && \
+    useradd -m -u $UID -g $GID -d /opt/mastodon mastodon && \
+    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd && \
+    echo "done"
 
 # add dumb-init
 ENV INIT_VER="1.2.2"
@@ -34,19 +64,19 @@ ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/ma
 
 # Install mastodon runtime deps
 RUN ln -s /opt/mastodon /mastodon && \
-        rm -rvf /var/cache && \
-        rm -rvf /var/lib/apt/lists/*
-
-RUN cd /opt/mastodon && \
-        bundle install -j$(nproc) --deployment --without development test
+    rm -rvf /var/cache && \
+    rm -rvf /var/lib/apt/lists/* && \
+    cd /opt/mastodon && \
+    bundle env && \
+    bundle install -j$(nproc) --no-deployment --without development test
 
 # git clone all sources
 # and modify version
 RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch  && \
-      cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
-      sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
-      mkdir /opt/mastodon/public/override && \
-      chown -R mastodon:mastodon /opt/mastodon
+    cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
+    sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
+    mkdir /opt/mastodon/public/override && \
+    chown -R mastodon:mastodon /opt/mastodon
 
 # Set the run user
 USER mastodon
@@ -57,9 +87,12 @@ ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
 RUN cd && \
-      yarn install --pure-lockfile && \
-      yarn cache clean 
-RUN cd && OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rake assets:precompile
+    yarn install --pure-lockfile && \
+    yarn cache clean && \ 
+    cd && \
+    export OTP_SECRET=precompile_placeholder && \
+    export SECRET_KEY_BASE=precompile_placeholder && \
+    bundle exec rake assets:precompile
 
 # Set the work dir and the container entry point
 WORKDIR /opt/mastodon
