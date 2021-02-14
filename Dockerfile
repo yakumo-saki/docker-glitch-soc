@@ -1,4 +1,6 @@
-FROM ruby:2.6-alpine
+FROM ruby:2.7.2
+
+ENV NODE_VER="12.20.2"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
@@ -6,20 +8,53 @@ ENV GITHUB_REPO=glitch-soc/mastodon
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 
-RUN apk add --no-cache whois nodejs yarn ca-certificates git bash \
-        gcc g++ make libc-dev file sed \
-        imagemagick protobuf-dev libpq ffmpeg icu-dev libidn-dev yaml-dev \
-        readline-dev postgresql-dev curl && \
-        update-ca-certificates && \
-    ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
+# whois contains mkpasswd
+RUN echo "*** phase 1 install nodejs" && \
+    apt-get update && \
+    apt-get -y --no-install-recommends install \
+        wget python whois \
+        git libicu-dev libidn11-dev \
+        libpq-dev libprotobuf-dev protobuf-compiler \
+        libssl1.1 libpq5 imagemagick ffmpeg \
+        libicu63 libprotobuf17 libidn11 libyaml-0-2 \
+        file ca-certificates tzdata libreadline7 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    cd ~ && \
+    wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-x64.tar.gz && \
+    tar xf node-v$NODE_VER-linux-x64.tar.gz && \
+    rm node-v$NODE_VER-linux-x64.tar.gz && \
+    mv node-v$NODE_VER-linux-x64 /opt/node  
+
+# Install jemalloc
+ENV JE_VER="5.2.1"
+#RUN echo "*** Compile jemalloc" && \
+#    apt-get update && \
+#    apt-get -y install make autoconf gcc g++ && \
+#    cd ~ && \
+#    wget -q https://github.com/jemalloc/jemalloc/archive/$JE_VER.tar.gz && \
+#    tar xf $JE_VER.tar.gz && \
+#    cd jemalloc-$JE_VER && \
+#    ./autogen.sh && \
+#    ./configure --prefix=/opt/jemalloc && \
+#    make -j$(nproc) > /dev/null && \
+#    make install_bin install_include install_lib
+
+# install node.js
+RUN echo "*** install yarn, bundler etc..." && \
+    npm install -g yarn && \
+    gem install bundler && \
+    echo "done"
 
 # Create the mastodon user
 ARG UID=991
 ARG GID=991
 RUN echo "Etc/UTC" > /etc/localtime && \
-	addgroup --gid $GID mastodon && \
-        adduser -D -u 991 -G mastodon -h /opt/mastodon mastodon && \
-	echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd
+    echo "not exec ln -s /opt/jemalloc/lib/* /usr/lib/" && \
+    addgroup --gid $GID mastodon && \
+    useradd -m -u $UID -g $GID -d /opt/mastodon mastodon && \
+    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd && \
+    echo "done"
 
 # add dumb-init
 ENV INIT_VER="1.2.2"
@@ -29,42 +64,49 @@ RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
 RUN chmod +x /dumb-init
 
 # Get gemfile from mastodon source
-ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile /opt/mastodon/Gemfile
-ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/mastodon/Gemfile.lock
-
-# Install mastodon runtime deps
-RUN ln -s /opt/mastodon /mastodon && \
-        rm -rvf /var/cache && \
-        rm -rvf /var/lib/apt/lists/*
-
-RUN cd /opt/mastodon && \
-        bundle install -j$(nproc) --deployment --without development test
+#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile /opt/mastodon/Gemfile
+#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/mastodon/Gemfile.lock
 
 # git clone all sources
 # and modify version
-RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch  && \
-      cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
-      sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
-      mkdir /opt/mastodon/public/override && \
-      chown -R mastodon:mastodon /opt/mastodon && \
-      mkdir /home/mastodon && chown -R mastodon:mastodon /home/mastodon
+#RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch  && \
+#    cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
+#    sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
+COPY --chown=mastodon:mastodon ./build /opt/mastodon
+
+# create override dir to replace files
+RUN mkdir /opt/mastodon/public/override && \
+    chown -R mastodon:mastodon /opt/mastodon
+
+# Install mastodon runtime deps
+RUN ln -s /opt/mastodon /mastodon && \
+    rm -rvf /var/cache && \
+    rm -rvf /var/lib/apt/lists/* && \
+    cd /opt/mastodon && \
+    bundle config set without 'development test' && \
+    bundle env && \
+    bundle install -j$(nproc) --no-deployment
+
+# 20210214
+# due to rdf gem's some files are not readable from others
+RUN chmod -R o+r /usr/local/bundle/gems/
 
 # Set the run user
 USER mastodon
-
-# Set the work dir and the container entry point
-WORKDIR /opt/mastodon
 
 # Tell rails to serve static files
 ENV RAILS_SERVE_STATIC_FILES="true"
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
 
-RUN cd /opt/mastodon && \
-      yarn install --pure-lockfile && \
-      yarn cache clean
-RUN cd /opt/mastodon && \
-      OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder \
-      bundle exec rake assets:precompile
+RUN cd && \
+    yarn install --pure-lockfile && \
+    yarn cache clean && \ 
+    cd && \
+    export OTP_SECRET=precompile_placeholder && \
+    export SECRET_KEY_BASE=precompile_placeholder && \
+    bundle exec rake assets:precompile
 
+# Set the work dir and the container entry point
+WORKDIR /opt/mastodon
 ENTRYPOINT ["/dumb-init", "--"]
