@@ -2,7 +2,7 @@
 
 ## why ?
 
-* official dockerfile needs much time to build.
+* official dockerfile needs much time to build. (Compiling ruby)
 * Using ruby official image to faster build.
 
 ## known issue
