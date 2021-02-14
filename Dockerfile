@@ -1,6 +1,6 @@
 FROM ruby:2.7.2
 
-ENV NODE_VER="12.16.3"
+ENV NODE_VER="12.20.2"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
@@ -16,8 +16,8 @@ RUN echo "*** phase 1 install nodejs" && \
         git libicu-dev libidn11-dev \
         libpq-dev libprotobuf-dev protobuf-compiler \
         libssl1.1 libpq5 imagemagick ffmpeg \
-	libicu63 libprotobuf17 libidn11 libyaml-0-2 \
-	file ca-certificates tzdata libreadline7 && \
+        libicu63 libprotobuf17 libidn11 libyaml-0-2 \
+        file ca-certificates tzdata libreadline7 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd ~ && \
