@@ -18,6 +18,7 @@ RUN echo "*** phase 1 install nodejs" && \
         libssl1.1 libpq5 imagemagick ffmpeg \
         libicu63 libprotobuf17 libidn11 libyaml-0-2 \
         file ca-certificates tzdata libreadline7 && \
+    apt-get install -y libjemalloc-dev libjemalloc2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd ~ && \
@@ -26,19 +27,8 @@ RUN echo "*** phase 1 install nodejs" && \
     rm node-v$NODE_VER-linux-x64.tar.gz && \
     mv node-v$NODE_VER-linux-x64 /opt/node  
 
-# Install jemalloc
-ENV JE_VER="5.2.1"
-#RUN echo "*** Compile jemalloc" && \
-#    apt-get update && \
-#    apt-get -y install make autoconf gcc g++ && \
-#    cd ~ && \
-#    wget -q https://github.com/jemalloc/jemalloc/archive/$JE_VER.tar.gz && \
-#    tar xf $JE_VER.tar.gz && \
-#    cd jemalloc-$JE_VER && \
-#    ./autogen.sh && \
-#    ./configure --prefix=/opt/jemalloc && \
-#    make -j$(nproc) > /dev/null && \
-#    make install_bin install_include install_lib
+# Use jemalloc
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 # install node.js
 RUN echo "*** install yarn, bundler etc..." && \
