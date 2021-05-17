@@ -1,6 +1,6 @@
-FROM ruby:2.7.2
+FROM ruby:2.7.3
 
-ENV NODE_VER="12.20.2"
+ENV NODE_VER="12.22.1"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
