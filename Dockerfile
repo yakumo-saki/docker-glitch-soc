@@ -1,4 +1,4 @@
-FROM ruby:2.7-bullseye
+FROM ruby:3.0-bullseye
 
 ENV NODE_VER="14.18.1"
 
