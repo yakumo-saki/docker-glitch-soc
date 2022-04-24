@@ -7,7 +7,8 @@
 
 ## known issue
 
-* Ruby not using jmalloc
+* ~Ruby not using jmalloc~
+* node.js version must be changed when node.js LTS is updated
 
 ## pre-built image 
 
