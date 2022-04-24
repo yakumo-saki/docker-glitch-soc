@@ -1,6 +1,6 @@
-FROM ruby:3.0-bullseye
+FROM ruby:3.1-bullseye
 
-ENV NODE_VER="14.18.1"
+ENV NODE_VER="16.14.2"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
