@@ -1,6 +1,13 @@
 FROM ruby:3.0.4-bullseye
 
 ENV NODE_VER="16.14.2"
+ENV NODE_PLATFORM="linux-arm64"
+
+ENV INIT_VER="1.2.5"
+ENV INIT_PLATFORM="aarch64"
+ENV INIT_SUM="b7d648f97154a99c539b63c55979cd29f005f88430fb383007fe3458340b795e"
+
+ENV DIR_LIB="/usr/lib/aarch64-linux-gnu"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
 #ENV GITHUB_REPO=tootsuite/mastodon
@@ -22,13 +29,13 @@ RUN echo "*** phase 1 install nodejs" && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd ~ && \
-    wget -q https://nodejs.org/download/release/v$NODE_VER/node-v$NODE_VER-linux-x64.tar.gz && \
-    tar xf node-v$NODE_VER-linux-x64.tar.gz && \
-    rm node-v$NODE_VER-linux-x64.tar.gz && \
-    mv node-v$NODE_VER-linux-x64 /opt/node  
+    wget -q https://nodejs.org/download/release/v${NODE_VER}/node-v${NODE_VER}-${NODE_PLATFORM}.tar.gz && \
+    tar xf node-v$NODE_VER-${NODE_PLATFORM}.tar.gz && \
+    rm node-v$NODE_VER-${NODE_PLATFORM}.tar.gz && \
+    mv node-v$NODE_VER-${NODE_PLATFORM} /opt/node  
 
 # Use jemalloc
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+ENV LD_PRELOAD=${DIR_LIB}/libjemalloc.so.2
 
 # install node.js
 RUN echo "*** install yarn, bundler etc..." && \
@@ -47,9 +54,7 @@ RUN echo "Etc/UTC" > /etc/localtime && \
     echo "done"
 
 # add dumb-init
-ENV INIT_VER="1.2.2"
-ENV INIT_SUM="37f2c1f0372a45554f1b89924fbb134fc24c3756efaedf11e07f599494e0eff9"
-ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_${INIT_VER}_amd64 /dumb-init
+ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_${INIT_VER}_${INIT_PLATFORM} /dumb-init
 RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
 RUN chmod +x /dumb-init
 
