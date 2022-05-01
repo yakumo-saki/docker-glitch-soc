@@ -8,12 +8,26 @@ BASE_DIR=$(cd $(dirname $0); pwd)
 DOCKERFILE="$BASE_DIR/Dockerfile"
 MASTODON_DIR="$BASE_DIR/build"
 
-# local docker image tag
 DOCKER_TAG=`date '+%Y%m%d_%H'`
-DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
 # x86_64 / aarch64
 ARCH=`uname -m`
+
+DOCKERHUB_IMAGENAME_AARCH64="yakumosaki/glitch-soc-aarch64"
+DOCKERHUB_IMAGENAME_X86_64="yakumosaki/glitch-soc"
+
+# =====================================================================
+# variables
+# =====================================================================
+
+if [ "$ARCH" = "x86_64" ]; then
+    DOCKERHUB_IMAGENAME=$DOCKERHUB_IMAGENAME_X86_64
+elif [ "$ARCH" = "aarch64" ]; then
+    DOCKERHUB_IMAGENAME=$DOCKERHUB_IMAGENAME_AARCH64
+else
+    echo "FATAL: Unknown arch $ARCH ! cant determine dockerhub image name."
+    exit 16
+fi
 
 # =====================================================================
 # functions
