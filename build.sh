@@ -44,9 +44,10 @@ function small_banner() {
 
 # is mastodon cloned ? 
 if [ ! -d $MASTODON_DIR ];then
-  echo "ERROR: 'build' directory not found."
-  echo "Please run"
+  echo "FATAL: 'build' directory not found."
+  echo "Please run command below on ${BASEDIR}"
   echo "git clone https://github.com/glitch-soc/mastodon.git build"
+  exit 16
 fi
 
 # get mastodon commit hash.
