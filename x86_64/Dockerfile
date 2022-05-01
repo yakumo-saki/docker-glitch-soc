@@ -1,16 +1,13 @@
 FROM ruby:3.0.4-bullseye
 
-ENV NODE_VER="16.14.2"
-ENV NODE_PLATFORM="linux-arm64"
+ENV NODE_VER="16.15.0"
+ENV NODE_PLATFORM="linux-x64"
 
 ENV INIT_VER="1.2.5"
 ENV INIT_PLATFORM="x86_64"
 ENV INIT_SUM="e874b55f3279ca41415d290c512a7ba9d08f98041b28ae7c2acb19a545f1c4df"
 
 ENV DIR_LIB="/usr/lib/x86_64-linux-gnu"
-
-ENV GITHUB_REPO=glitch-soc/mastodon
-#ENV GITHUB_REPO=tootsuite/mastodon
 
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
@@ -58,16 +55,7 @@ ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_$
 RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
 RUN chmod +x /dumb-init
 
-# Get gemfile from mastodon source
-#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile /opt/mastodon/Gemfile
-#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/mastodon/Gemfile.lock
-
-# git clone all sources
-# and modify version
-#RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch  && \
-#    cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
-#    sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
-COPY --chown=mastodon:mastodon ./build /opt/mastodon
+COPY --chown=mastodon:mastodon ../build /opt/mastodon
 
 # create override dir to replace files
 RUN mkdir /opt/mastodon/public/override && \

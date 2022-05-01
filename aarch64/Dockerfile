@@ -1,6 +1,6 @@
 FROM ruby:3.0.4-bullseye
 
-ENV NODE_VER="16.14.2"
+ENV NODE_VER="16.15.0"
 ENV NODE_PLATFORM="linux-arm64"
 
 ENV INIT_VER="1.2.5"
