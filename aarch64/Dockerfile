@@ -10,7 +10,10 @@ ENV INIT_SUM="b7d648f97154a99c539b63c55979cd29f005f88430fb383007fe3458340b795e"
 ENV DIR_LIB="/usr/lib/aarch64-linux-gnu"
 
 ENV GITHUB_REPO=glitch-soc/mastodon
-#ENV GITHUB_REPO=tootsuite/mastodon
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  Completely same all arches after this line
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
@@ -55,18 +58,9 @@ RUN echo "Etc/UTC" > /etc/localtime && \
 
 # add dumb-init
 ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_${INIT_VER}_${INIT_PLATFORM} /dumb-init
-RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
-RUN chmod +x /dumb-init
+RUN echo "$INIT_SUM  dumb-init" | sha256sum -c - && \
+    chmod +x /dumb-init
 
-# Get gemfile from mastodon source
-#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile /opt/mastodon/Gemfile
-#ADD https://raw.githubusercontent.com/${GITHUB_REPO}/master/Gemfile.lock /opt/mastodon/Gemfile.lock
-
-# git clone all sources
-# and modify version
-#RUN cd /opt && git clone --depth 1 https://github.com/${GITHUB_REPO}.git glitch  && \
-#    cp -rf /opt/glitch/* /opt/mastodon/ && rm -rf /opt/glitch && \
-#    sed -i /opt/mastodon/lib/mastodon/version.rb -e "s/\+glitch/\+glitch_`date '+%m%d'`/"  && \
 COPY --chown=mastodon:mastodon ./build /opt/mastodon
 
 # create override dir to replace files

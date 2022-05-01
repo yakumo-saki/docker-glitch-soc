@@ -9,6 +9,10 @@ ENV INIT_SUM="e874b55f3279ca41415d290c512a7ba9d08f98041b28ae7c2acb19a545f1c4df"
 
 ENV DIR_LIB="/usr/lib/x86_64-linux-gnu"
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  Completely same all arches after this line
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 
@@ -52,10 +56,10 @@ RUN echo "Etc/UTC" > /etc/localtime && \
 
 # add dumb-init
 ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_${INIT_VER}_${INIT_PLATFORM} /dumb-init
-RUN echo "$INIT_SUM  dumb-init" | sha256sum -c -
-RUN chmod +x /dumb-init
+RUN echo "$INIT_SUM  dumb-init" | sha256sum -c - && \
+    chmod +x /dumb-init
 
-COPY --chown=mastodon:mastodon ../build /opt/mastodon
+COPY --chown=mastodon:mastodon ./build /opt/mastodon
 
 # create override dir to replace files
 RUN mkdir /opt/mastodon/public/override && \
