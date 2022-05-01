@@ -6,7 +6,7 @@
 
 BASE_DIR=$(cd $(dirname $0); pwd)
 DOCKERFILE="$BASE_DIR/Dockerfile"
-MASTODON_DIR="$BASE_DIR/build"
+MASTODON_DIR="$BASE_DIR/mastodon"
 
 DOCKER_TAG=`date '+%Y%m%d_%H'`
 
@@ -60,7 +60,7 @@ function small_banner() {
 if [ ! -d $MASTODON_DIR ];then
   echo "FATAL: 'build' directory not found."
   echo "Please run command below on ${BASE_DIR}"
-  echo "git clone https://github.com/glitch-soc/mastodon.git build"
+  echo "git clone https://github.com/glitch-soc/mastodon.git mastodon"
   exit 16
 fi
 
