@@ -20,13 +20,13 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 RUN echo "*** phase 1 install nodejs" && \
     apt-get update && \
     apt-get -y --no-install-recommends install \
-        wget python whois \
+        wget whois \
         git libicu-dev libidn11-dev \
         libpq-dev libprotobuf-dev protobuf-compiler \
         libssl1.1 libpq5 imagemagick ffmpeg \
         libicu67 libidn11 libyaml-0-2 \
-        file ca-certificates tzdata libreadline8 && \
-    apt-get install -y libjemalloc-dev libjemalloc2 && \
+        file ca-certificates tzdata libreadline8 \
+        libjemalloc-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd ~ && \
@@ -62,15 +62,16 @@ RUN echo "$INIT_SUM  dumb-init" | sha256sum -c - && \
 COPY --chown=mastodon:mastodon ./build /opt/mastodon
 
 # create override dir to replace files
-RUN mkdir /opt/mastodon/public/override && \
-    chown -R mastodon:mastodon /opt/mastodon
+RUN mkdir /opt/mastodon/public/override
 
 # Install mastodon runtime deps
 RUN ln -s /opt/mastodon /mastodon && \
     rm -rvf /var/cache && \
     rm -rvf /var/lib/apt/lists/* && \
     cd /opt/mastodon && \
-    bundle config set without 'development test' && \
+    bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle config set silence_root_warning true && \
     bundle env && \
     bundle install -j$(nproc) --no-deployment
 
@@ -85,11 +86,11 @@ USER mastodon
 ENV RAILS_SERVE_STATIC_FILES="true"
 ENV RAILS_ENV="production"
 ENV NODE_ENV="production"
+ENV BIND="0.0.0.0"
 
 RUN cd && \
     yarn install --pure-lockfile && \
     yarn cache clean && \ 
-    npx browserslist@latest --update-db && \
     cd && \
     export OTP_SECRET=precompile_placeholder && \
     export SECRET_KEY_BASE=precompile_placeholder && \

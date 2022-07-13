@@ -1,5 +1,18 @@
 #!/bin/bash -eu
 
+# PARAMS
+if [ $# -ne 2 ]; then
+  echo "Usage: `basename $0` <imagename> <tag>" 1>&2
+  echo "<imagename>: docker imagename example) yakumosaki/glitch-soc"
+  echo "<tag>      : docker image tag  example) 20200713_1300"
+
+  exit 1
+fi
+
+# local docker image tag
+DOCKERHUB_IMAGENAME=$1
+DOCKER_TAG=$2
+
 # =====================================================================
 # config
 # =====================================================================
@@ -7,10 +20,6 @@
 BASE_DIR=$(cd $(dirname $0); pwd)
 DOCKERFILE="$BASE_DIR/Dockerfile"
 MASTODON_DIR="$BASE_DIR/build"
-
-# local docker image tag
-DOCKER_TAG=`date '+%Y%m%d_%H'`
-DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
 # x86_64 / aarch64
 ARCH=`uname -m`
@@ -82,25 +91,8 @@ process_banner "docker build"
 cd $BASE_DIR
 echo "building docker image ${DOCKERHUB_IMAGENAME}:${DOCKER_TAG} on `pwd`"
 
-docker build -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG -f $ARCH/Dockerfile .
+docker buildx build -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG -f $ARCH/Dockerfile .
 docker tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG $DOCKERHUB_IMAGENAME:latest
-
-exit 16
-
-process_banner "tagging and upload"
-echo "docker tag is $DOCKERHUB_IMAGENAME:$DOCKER_TAG [latest]"
-
-docker push $DOCKERHUB_IMAGENAME:$DOCKER_TAG
-docker push $DOCKERHUB_IMAGENAME:latest
-
-echo "docker push success."
-
-# バージョンつきイメージはローカルには不要なので消しておく
-echo ""
-echo "*** delete tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG ***"
-docker image rm $DOCKERHUB_IMAGENAME:$DOCKER_TAG
-
-#yes | docker image prune
 
 echo ""
 echo "### BUILD SUCCESS ###"
