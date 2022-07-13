@@ -27,8 +27,8 @@ RUN echo "*** phase 1 install nodejs" && \
         libpq-dev libprotobuf-dev protobuf-compiler \
         libssl1.1 libpq5 imagemagick ffmpeg \
         libicu67 libidn11 libyaml-0-2 \
-        file ca-certificates tzdata libreadline8 && \
-    apt-get install -y libjemalloc-dev libjemalloc2 && \
+        file ca-certificates tzdata libreadline8 \
+        libjemalloc-dev libjemalloc2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd ~ && \
