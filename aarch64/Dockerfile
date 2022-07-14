@@ -61,7 +61,7 @@ ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_$
 RUN echo "$INIT_SUM  dumb-init" | sha256sum -c - && \
     chmod +x /dumb-init
 
-COPY --chown=mastodon:mastodon ./build /opt/mastodon
+COPY --chown=mastodon:mastodon ./mastodon /opt/mastodon
 
 # create override dir to replace files
 RUN mkdir /opt/mastodon/public/override && \
