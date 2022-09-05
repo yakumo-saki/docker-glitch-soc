@@ -1,0 +1,37 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Import variable MAGIC_NUMBER
+      uses: UnlyEd/github-action-store-variable@v2.1.0 # See https://github.com/UnlyEd/github-action-store-variable
+      with:
+        # List all variables you want to retrieve from the store
+        # XXX They'll be automatically added to your ENV
+        variables: | 
+          MAGIC_NUMBER
+          
+    - name: Debug output
+      run: echo "We have access to $MAGIC_NUMBER"
+
+    # - uses: actions/checkout@v3
+    - name: Fetch release version
+      run: |
+        DOCKER_TAG=`date '+%Y%m%d_%H'`
+        DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
+        echo "MAGIC_NUMBER=42" >> $GITHUB_ENV
+
+    - name: Export variable for next jobs
+      uses: UnlyEd/github-action-store-variable@v2.1.4
+      with:
+        variables: |
+          MAGIC_NUMBER=${{ env.MAGIC_NUMBER }}
+          
