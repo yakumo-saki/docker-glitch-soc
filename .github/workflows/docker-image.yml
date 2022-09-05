@@ -35,7 +35,7 @@ jobs:
         echo "MAGIC_NUMBER=42" >> $GITHUB_ENV
 
     - name: Export variable for next jobs
-      uses: UnlyEd/github-action-store-variable@v2.1.4
+      uses: UnlyEd/github-action-store-variable@v2.1.0
       with:
         variables: |
           MAGIC_NUMBER=${{ env.MAGIC_NUMBER }}
