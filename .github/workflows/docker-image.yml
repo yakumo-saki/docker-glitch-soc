@@ -16,27 +16,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Import variable MAGIC_NUMBER
-      uses: UnlyEd/github-action-store-variable@v2.1.0 # See https://github.com/UnlyEd/github-action-store-variable
+    - uses: actions/download-artifact@v3
+      id: artifact
       with:
-        # List all variables you want to retrieve from the store
-        # XXX They'll be automatically added to your ENV
-        variables: | 
-          MAGIC_NUMBER
-          
+        name: 'last-commit'
+        path: artifact.txt
+
+    - name: 'Echo download path'
+      run: |
+        echo ${{steps.artifact.outputs.download-path}}
+        cat ${{steps.artifact.outputs.download-path}}/artifact.txt 
+        LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/artifact.txt `
+        echo $LAST_TAG >> $GITHUB_ENV
+
     - name: Debug output
-      run: echo "We have access to $MAGIC_NUMBER"
+      run: echo "last tag is $LAST_TAG"
 
     # - uses: actions/checkout@v3
     - name: Fetch release version
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
-        echo "MAGIC_NUMBER=42" >> $GITHUB_ENV
+        cat $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}/artifact.txt
+        echo $DOCKER_TAG
 
-    - name: Export variable for next jobs
-      uses: UnlyEd/github-action-store-variable@v2.1.0
+    - uses: actions/upload-artifact@v3
       with:
-        variables: |
-          MAGIC_NUMBER=${{ env.MAGIC_NUMBER }}
-          
+        name: 'last-commit'
+        path: ${{steps.artifact.outputs.download-path}}/artifact.txt
