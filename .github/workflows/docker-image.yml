@@ -28,6 +28,12 @@ jobs:
         echo "dummy" > artifact.txt
 
     - name: 'Upload dummy artifact'
+      uses: actions/upload-artifact@v3
+      with:
+        name: 'last-commit'
+        path: artifact.txt
+
+    - name: 'Download last-commit artifact'
       uses: actions/download-artifact@v3
       id: artifact
       with:
