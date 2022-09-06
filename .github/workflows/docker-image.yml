@@ -55,28 +55,34 @@ jobs:
     - name: 'glitch-soc更新があるかチェック'
       run: |
         echo ${{steps.artifact.outputs.download-path}}
-        # cat ${{steps.artifact.outputs.download-path}} 
+        # cat ${{steps.artifact.outputs.download-path}}
         ls -alr .
+        echo "-----"
+        ls -alr ${{steps.artifact.outputs.download-path}}
+        echo "-----"
+
         LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
         echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
         TAG=`git ls-remote --heads git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git | cut -f 1`
         
         echo "check commit-id head=${TAG} last-built=${LAST_TAG}"
-        
-        if [ "$LAST_TAG" = "$TAG" ]; then
-          echo "更新なし"
-          exit 1
+
+        if [ "${{env.force}}" = "false" ]; then
+          if [ "$LAST_TAG" = "$TAG" ]; then
+            echo "更新なし"
+            exit 1
+          fi
         fi
-
-    - name: Debug output
-      run: echo "last tag is $LAST_TAG"
-
+        
+        echo $LAST_TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
+        
     - uses: actions/checkout@v3
+    
     - name: Fetch release version
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
-        echo $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
+        
         
 
     - uses: actions/upload-artifact@v3
