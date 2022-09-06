@@ -16,22 +16,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: xSAVIKx/artifact-exists-action@v0
+    - name: 'Check last-commit artifact'
+      uses: xSAVIKx/artifact-exists-action@v0
       id: check_artifact
       with:
         name: 'artifact.txt'
 
-    - uses: actions/download-artifact@v3
+    - name: 'Create null artifact.txt'
+      if: steps.check_artifact.outputs.exists == 'false'
+      run: |
+        echo "dummy" > artifact.txt
+
+    - name: 'Upload dummy artifact'
+      uses: actions/download-artifact@v3
       id: artifact
-      if: steps.check_artifact.outputs.exists == 'true'
       with:
         name: 'last-commit'
         path: artifact.txt
-
-    - name: 'Create dummy artifact'
-      if: steps.check_artifact.outputs.exists == 'false'
-      run: |
-        touch ${{steps.artifact.outputs.download-path}}/artifact.txt
 
     - name: 'Echo download path'
       run: |
