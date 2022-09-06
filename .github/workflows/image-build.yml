@@ -59,13 +59,14 @@ jobs:
     - name: 'glitch-soc更新があるかチェック'
       run: |
         WORK=`pwd`
-
+        LAST_COMMIT_FILE="${{steps.artifact.outputs.download-path}}/last-commit.txt"
+        
         # echo ${{steps.artifact.outputs.download-path}}
-        LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
+        LAST_TAG=`cat $LAST_COMMIT_FILE`
         TAG=`git ls-remote --heads ${{ env.mastodon_url }} | grep "refs/heads/main" | cut -f 1`
         
         echo "FORCE=${{env.force}} check commit-id head=${TAG} last-built=${LAST_TAG}"
-        if [ "${{env.force}}" = "false" ]; then
+        if [ "${{env.force}}" != "true" ]; then
           if [ "$LAST_TAG" = "$TAG" ]; then
             echo "更新なし"
             #exit 0
@@ -83,7 +84,7 @@ jobs:
         #${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
 
         echo "Update last built commit-id artifact"
-        echo $TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
+        echo $TAG > $LAST_COMMIT_FILE
 
     - uses: actions/upload-artifact@v3
       with:
