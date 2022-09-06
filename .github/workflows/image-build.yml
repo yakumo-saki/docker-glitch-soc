@@ -1,3 +1,16 @@
+name: Build glitch-soc docker Image
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force create '
+        type: boolean
+      dryrun:
+        description: 'Dry-run'
+        type: boolean
 jobs:
   build:
 
@@ -56,7 +69,6 @@ jobs:
           echo "FORCE rebuild skipping commit-id check"
         fi
         
-
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
