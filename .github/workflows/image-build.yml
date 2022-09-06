@@ -21,53 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-#     - name: 'Create null artifact.txt'
-#       if: steps.check_artifact.outputs.exists == 'false'
-#       run: |
-#         mkdir -p last-commit
-#         echo "dummy" > last-commit/last-commit.txt
-
-#     - name: 'Upload null artifact'
-#       if: steps.check_artifact.outputs.exists == 'false'
-#       uses: actions/upload-artifact@v3
-#       with:
-#         name: 'last-commit'
-#         path: last-commit
-
-#     - name: 'Clean up dummy artifact'
-#       if: steps.check_artifact.outputs.exists == 'false'
-#       run: |
-#         rm -rf last-commit
-
-    # 本処理。
     - uses: actions/checkout@v3
-
-    - name: 'Download last-commit artifact'
-      uses: actions/download-artifact@v3
-      id: artifact
-      with:
-        name: 'last-commit'
-        path: last-commit
 
     - name: 'glitch-soc更新があるかチェック'
       run: |
         WORK=`pwd`
-        LAST_COMMIT_FILE="${{steps.artifact.outputs.download-path}}/last-commit.txt"
-        
-        # echo ${{steps.artifact.outputs.download-path}}
-        cat $LAST_COMMIT_FILE
-        LAST_TAG=`cat $LAST_COMMIT_FILE`
-        TAG=`git ls-remote --heads ${{ env.mastodon_url }} | grep "refs/heads/main" | cut -f 1`
-        
-        echo "Check commit-id head=${TAG} last-built=${LAST_TAG} FORCE=[${{env.force}}]"
-        if [ "${{env.force}}" != "true" ]; then
-          if [ "$LAST_TAG" = "$TAG" ]; then
-            echo "更新なし"
-            #exit 0
-          fi
-        else 
-          echo "FORCE rebuild skipping commit-id check"
-        fi
         
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
@@ -76,11 +34,3 @@ jobs:
         #git clone ${{ env.mastodon_url }}
         #
         #${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
-
-        echo "Update last built commit-id artifact $TAG"
-        echo $TAG > $LAST_COMMIT_FILE
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: 'last-commit'
-        path: ${{steps.artifact.outputs.download-path}}
