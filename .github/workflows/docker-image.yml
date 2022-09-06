@@ -73,7 +73,7 @@ jobs:
             exit 1
           fi
         else 
-          echo "FORCE rebuild"
+          echo "FORCE rebuild skipping commit-id check"
         fi
         
         echo $TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
@@ -88,4 +88,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: ${{steps.artifact.outputs.download-path}}
+        path: last-commit
