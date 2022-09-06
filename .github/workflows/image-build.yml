@@ -62,7 +62,7 @@ jobs:
 
         # echo ${{steps.artifact.outputs.download-path}}
         LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
-        TAG=`git ls-remote --heads ${{ env.mastodon_url }} | cut -f 1`
+        TAG=`git ls-remote --heads ${{ env.mastodon_url }} | grep "refs/heads/main" | cut -f 1`
         
         echo "FORCE=${{env.force}} check commit-id head=${TAG} last-built=${LAST_TAG}"
         if [ "${{env.force}}" = "false" ]; then
