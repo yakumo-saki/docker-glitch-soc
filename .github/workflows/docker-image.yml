@@ -5,17 +5,21 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to run tests against'
-        type: environment
-        required: true
-
+      force:
+        description: 'Force create '
+        type: boolean
+      dryrun:
+        description: 'Dry-run'
+        type: boolean
+env:
+  nouse : test
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
+    # last-commitが存在するかチェックして存在していれば取得。なければダミーで作成
     - name: 'Check last-commit artifact'
       uses: xSAVIKx/artifact-exists-action@v0
       id: check_artifact
@@ -40,6 +44,7 @@ jobs:
       run: |
         rm -rf last-commit
 
+    # 本処理。
     - name: 'Download last-commit artifact'
       uses: actions/download-artifact@v3
       id: artifact
@@ -47,24 +52,32 @@ jobs:
         name: 'last-commit'
         path: last-commit
 
-    - name: 'Echo download path'
+    - name: 'glitch-soc更新があるかチェック'
       run: |
         echo ${{steps.artifact.outputs.download-path}}
         # cat ${{steps.artifact.outputs.download-path}} 
         ls -alr .
         LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
-        echo "LAST_TAG=AAAAA$LAST_TAG" >> $GITHUB_ENV
+        echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
+        TAG=`git ls-remote --heads git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git | cut -f 1`
+        
+        echo "check commit-id head=${TAG} last-built=${LAST_TAG}"
+        
+        if [ "$LAST_TAG" = "$TAG" ]; then
+          echo "更新なし"
+          exit 1
+        fi
 
     - name: Debug output
       run: echo "last tag is $LAST_TAG"
 
-    # - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     - name: Fetch release version
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
         echo $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
-        echo $DOCKER_TAG
+        
 
     - uses: actions/upload-artifact@v3
       with:
