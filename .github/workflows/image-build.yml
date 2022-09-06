@@ -1,18 +1,9 @@
 name: Build glitch-soc docker Image
 
 on:
-  push:
-    branches: [ "master" ]
-  workflow_dispatch:
-    inputs:
-      force:
-        description: 'Force create '
-        type: boolean
-        default: false 
-      dryrun:
-        description: 'Dry-run'
-        type: boolean
-        default: false 
+  repository_dispatch:
+    types:
+      - webhook
 env:
   mastodon_url: "https://github.com/glitch-soc/mastodon.git"
 jobs:
