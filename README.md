@@ -1,3 +1,5 @@
+[![Build glitch-soc docker Image](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml/badge.svg)](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml)
+
 # Mastodon Glitch Edition Dockerfile and docker-compose
 
 ## news
