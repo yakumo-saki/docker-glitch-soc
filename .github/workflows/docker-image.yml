@@ -43,7 +43,7 @@ jobs:
     - name: 'Echo download path'
       run: |
         echo ${{steps.artifact.outputs.download-path}}
-        cat ${{steps.artifact.outputs.download-path}} 
+        # cat ${{steps.artifact.outputs.download-path}} 
         ls -alr .
         # LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}`
         echo "AAAAAA$LAST_TAG" >> $GITHUB_ENV
