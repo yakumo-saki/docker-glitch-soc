@@ -25,13 +25,13 @@ jobs:
     - name: 'Create null artifact.txt'
       if: steps.check_artifact.outputs.exists == 'false'
       run: |
-        echo "dummy" > artifact.txt
+        echo "dummy" > dummy.txt
 
     - name: 'Upload dummy artifact'
       uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: artifact.txt
+        path: dummy.txt
 
     - name: 'Download last-commit artifact'
       uses: actions/download-artifact@v3
