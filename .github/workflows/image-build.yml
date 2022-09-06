@@ -34,12 +34,12 @@ jobs:
         mkdir -p last-commit
         echo "dummy" > last-commit/last-commit.txt
 
-    - name: 'Upload dummy artifact'
+    - name: 'Upload null artifact'
       if: steps.check_artifact.outputs.exists == 'false'
       uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: last-commit
+        path: last-commit/last-commit.txt
 
     - name: 'Clean up dummy artifact'
       if: steps.check_artifact.outputs.exists == 'false'
@@ -62,10 +62,11 @@ jobs:
         LAST_COMMIT_FILE="${{steps.artifact.outputs.download-path}}/last-commit.txt"
         
         # echo ${{steps.artifact.outputs.download-path}}
+        cat $LAST_COMMIT_FILE
         LAST_TAG=`cat $LAST_COMMIT_FILE`
         TAG=`git ls-remote --heads ${{ env.mastodon_url }} | grep "refs/heads/main" | cut -f 1`
         
-        echo "FORCE=${{env.force}} check commit-id head=${TAG} last-built=${LAST_TAG}"
+        echo "Check commit-id head=${TAG} last-built=${LAST_TAG} FORCE=[${{env.force}}]"
         if [ "${{env.force}}" != "true" ]; then
           if [ "$LAST_TAG" = "$TAG" ]; then
             echo "更新なし"
