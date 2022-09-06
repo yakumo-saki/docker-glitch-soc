@@ -38,7 +38,7 @@ jobs:
     - name: 'Clean up dummy artifact'
       if: steps.check_artifact.outputs.exists == 'false'
       run: |
-        rmdir last-commit
+        rmdir -rf last-commit
 
     - name: 'Download last-commit artifact'
       uses: actions/download-artifact@v3
