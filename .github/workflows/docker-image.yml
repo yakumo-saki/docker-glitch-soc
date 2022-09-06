@@ -25,20 +25,27 @@ jobs:
     - name: 'Create null artifact.txt'
       if: steps.check_artifact.outputs.exists == 'false'
       run: |
-        echo "dummy" > dummy.txt
+        mkdir -p last-commit
+        echo "dummy" > last-commit/last-commit.txt
 
     - name: 'Upload dummy artifact'
+      if: steps.check_artifact.outputs.exists == 'false'
       uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: dummy.txt
+        path: last-commit
+
+    - name: 'Clean up dummy artifact'
+      if: steps.check_artifact.outputs.exists == 'false'
+      run: |
+        rmdir last-commit
 
     - name: 'Download last-commit artifact'
       uses: actions/download-artifact@v3
       id: artifact
       with:
         name: 'last-commit'
-        path: artifact.txt
+        path: last-commit
 
     - name: 'Echo download path'
       run: |
@@ -46,7 +53,7 @@ jobs:
         # cat ${{steps.artifact.outputs.download-path}} 
         ls -alr .
         # LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}`
-        echo "AAAAAA$LAST_TAG" >> $GITHUB_ENV
+        echo "LAST_TAG=AAAAA$LAST_TAG" >> $GITHUB_ENV
 
     - name: Debug output
       run: echo "last tag is $LAST_TAG"
