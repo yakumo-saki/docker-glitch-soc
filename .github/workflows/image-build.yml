@@ -83,7 +83,7 @@ jobs:
         #
         #${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
 
-        echo "Update last built commit-id artifact"
+        echo "Update last built commit-id artifact $TAG"
         echo $TAG > $LAST_COMMIT_FILE
 
     - uses: actions/upload-artifact@v3
