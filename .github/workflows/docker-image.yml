@@ -20,7 +20,7 @@ jobs:
       uses: xSAVIKx/artifact-exists-action@v0
       id: check_artifact
       with:
-        name: 'artifact.txt'
+        name: 'last-commit'
 
     - name: 'Create null artifact.txt'
       if: steps.check_artifact.outputs.exists == 'false'
@@ -52,7 +52,7 @@ jobs:
         echo ${{steps.artifact.outputs.download-path}}
         # cat ${{steps.artifact.outputs.download-path}} 
         ls -alr .
-        # LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}`
+        LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
         echo "LAST_TAG=AAAAA$LAST_TAG" >> $GITHUB_ENV
 
     - name: Debug output
@@ -63,7 +63,7 @@ jobs:
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
-        cat $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}
+        cat $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
         echo $DOCKER_TAG
 
     - uses: actions/upload-artifact@v3
