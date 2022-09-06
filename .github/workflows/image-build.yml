@@ -8,9 +8,11 @@ on:
       force:
         description: 'Force create '
         type: boolean
+        default: false 
       dryrun:
         description: 'Dry-run'
         type: boolean
+        default: false 
 jobs:
   build:
 
@@ -61,15 +63,15 @@ jobs:
         echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
         TAG=`git ls-remote --heads git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git | cut -f 1`
         
-        echo "check commit-id head=${TAG} last-built=${LAST_TAG}"
-        if [ "${{env.force}}" = "false" ]; then
-          if [ "$LAST_TAG" = "$TAG" ]; then
-            echo "更新なし"
-            exit 1
-          fi
-        else 
-          echo "FORCE rebuild skipping commit-id check"
-        fi
+        echo "FORCE=${{env.force}} check commit-id head=${TAG} last-built=${LAST_TAG}"
+        #if [ "${{env.force}}" = "false" ]; then
+        #  if [ "$LAST_TAG" = "$TAG" ]; then
+        #    echo "更新なし"
+        #    exit 1
+        #  fi
+        #else 
+        #  echo "FORCE rebuild skipping commit-id check"
+        #fi
         
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
