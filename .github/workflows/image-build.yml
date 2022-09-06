@@ -21,30 +21,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # last-commitが存在するかチェックして存在していれば取得。なければダミーで作成
-    - name: 'Check last-commit artifact'
-      uses: xSAVIKx/artifact-exists-action@v0
-      id: check_artifact
-      with:
-        name: 'last-commit'
+#     - name: 'Create null artifact.txt'
+#       if: steps.check_artifact.outputs.exists == 'false'
+#       run: |
+#         mkdir -p last-commit
+#         echo "dummy" > last-commit/last-commit.txt
 
-    - name: 'Create null artifact.txt'
-      if: steps.check_artifact.outputs.exists == 'false'
-      run: |
-        mkdir -p last-commit
-        echo "dummy" > last-commit/last-commit.txt
+#     - name: 'Upload null artifact'
+#       if: steps.check_artifact.outputs.exists == 'false'
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: 'last-commit'
+#         path: last-commit
 
-    - name: 'Upload null artifact'
-      if: steps.check_artifact.outputs.exists == 'false'
-      uses: actions/upload-artifact@v3
-      with:
-        name: 'last-commit'
-        path: last-commit
-
-    - name: 'Clean up dummy artifact'
-      if: steps.check_artifact.outputs.exists == 'false'
-      run: |
-        rm -rf last-commit
+#     - name: 'Clean up dummy artifact'
+#       if: steps.check_artifact.outputs.exists == 'false'
+#       run: |
+#         rm -rf last-commit
 
     # 本処理。
     - uses: actions/checkout@v3
