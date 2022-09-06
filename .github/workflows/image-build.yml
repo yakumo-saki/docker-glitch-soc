@@ -68,7 +68,7 @@ jobs:
         if [ "${{env.force}}" = "false" ]; then
           if [ "$LAST_TAG" = "$TAG" ]; then
             echo "更新なし"
-            exit 0
+            #exit 0
           fi
         else 
           echo "FORCE rebuild skipping commit-id check"
@@ -78,9 +78,9 @@ jobs:
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
-        git clone ${{ env.mastodon_url }}
-        
-        ${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
+        #git clone ${{ env.mastodon_url }}
+        #
+        #${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
 
         echo "Update last built commit-id artifact"
         echo $TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
@@ -88,4 +88,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: last-commit
+        path: ${{steps.artifact.outputs.download-path}}/last-commit.txt
