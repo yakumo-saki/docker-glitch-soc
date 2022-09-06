@@ -13,6 +13,8 @@ on:
         description: 'Dry-run'
         type: boolean
         default: false 
+env:
+  mastodon_url: "https://github.com/glitch-soc/mastodon.git"
 jobs:
   build:
 
@@ -58,26 +60,25 @@ jobs:
       run: |
         WORK=`pwd`
 
-        echo ${{steps.artifact.outputs.download-path}}
+        # echo ${{steps.artifact.outputs.download-path}}
         LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
-        echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
-        TAG=`git ls-remote --heads git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git | cut -f 1`
+        TAG=`git ls-remote --heads ${{ env.mastodon_url }} | cut -f 1`
         
         echo "FORCE=${{env.force}} check commit-id head=${TAG} last-built=${LAST_TAG}"
-        #if [ "${{env.force}}" = "false" ]; then
-        #  if [ "$LAST_TAG" = "$TAG" ]; then
-        #    echo "更新なし"
-        #    exit 1
-        #  fi
-        #else 
-        #  echo "FORCE rebuild skipping commit-id check"
-        #fi
+        if [ "${{env.force}}" = "false" ]; then
+          if [ "$LAST_TAG" = "$TAG" ]; then
+            echo "更新なし"
+            exit 0
+          fi
+        else 
+          echo "FORCE rebuild skipping commit-id check"
+        fi
         
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
-        git clone https://github.com/glitch-soc/mastodon.git
+        git clone ${{ env.mastodon_url }}
         
         ${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
 
