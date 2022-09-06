@@ -43,8 +43,8 @@ jobs:
     - name: 'Echo download path'
       run: |
         echo ${{steps.artifact.outputs.download-path}}
-        cat ${{steps.artifact.outputs.download-path}}/artifact.txt 
-        LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/artifact.txt`
+        cat ${{steps.artifact.outputs.download-path}} 
+        LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}`
         echo $LAST_TAG >> $GITHUB_ENV
 
     - name: Debug output
@@ -55,10 +55,10 @@ jobs:
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
-        cat $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}/artifact.txt
+        cat $DOCKER_TAG > ${{steps.artifact.outputs.download-path}}
         echo $DOCKER_TAG
 
     - uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: ${{steps.artifact.outputs.download-path}}/artifact.txt
+        path: ${{steps.artifact.outputs.download-path}}
