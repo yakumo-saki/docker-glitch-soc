@@ -39,7 +39,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: last-commit/last-commit.txt
+        path: last-commit
 
     - name: 'Clean up dummy artifact'
       if: steps.check_artifact.outputs.exists == 'false'
@@ -90,4 +90,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: 'last-commit'
-        path: ${{steps.artifact.outputs.download-path}}/last-commit.txt
+        path: ${{steps.artifact.outputs.download-path}}
