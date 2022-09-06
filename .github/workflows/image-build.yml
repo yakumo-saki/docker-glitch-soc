@@ -54,6 +54,8 @@ jobs:
 
     - name: 'glitch-soc更新があるかチェック'
       run: |
+        WORK=`pwd`
+
         echo ${{steps.artifact.outputs.download-path}}
         LAST_TAG=`cat ${{steps.artifact.outputs.download-path}}/last-commit.txt`
         echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
@@ -76,7 +78,7 @@ jobs:
         cd ${WORK}/mastodon
         git clone https://github.com/glitch-soc/mastodon.git
 
-        cd
+        cd ${WORK}
         ./build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
 
         echo "Update last built commit-id artifact"
