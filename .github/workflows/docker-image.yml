@@ -72,9 +72,11 @@ jobs:
             echo "更新なし"
             exit 1
           fi
+        else 
+          echo "FORCE rebuild"
         fi
         
-        echo $LAST_TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
+        echo $TAG > ${{steps.artifact.outputs.download-path}}/last-commit.txt
         
     - uses: actions/checkout@v3
     
@@ -82,8 +84,6 @@ jobs:
       run: |
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
-        
-        
 
     - uses: actions/upload-artifact@v3
       with:
