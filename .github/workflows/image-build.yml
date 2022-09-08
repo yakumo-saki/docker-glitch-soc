@@ -1,6 +1,7 @@
 name: Build glitch-soc docker Image
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types:
       - webhook
