@@ -25,9 +25,10 @@ jobs:
 
         git clone ${{ env.mastodon_url }}
         
-        ${WORK}/build.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
+        ${WORK}/prepare.sh
         
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+        echo "DOCKERHUB_IMAGENAME=$DOCKERHUB_IMAGENAME" >> $GITHUB_ENV
         
     - name: Login to DockerHub
       uses: docker/login-action@v2
@@ -39,10 +40,4 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: user/app:latest
-
-    - name: Build and push tag
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: user/app:${{ env.DOCKER_TAG }}
+        tags: ${{ env.DOCKERHUB_IMAGENAME }}:latest,${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }}

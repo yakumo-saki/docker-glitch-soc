@@ -1,18 +1,5 @@
 #!/bin/bash -eu
 
-# PARAMS
-if [ $# -ne 2 ]; then
-  echo "Usage: `basename $0` <imagename> <tag>" 1>&2
-  echo "<imagename>: docker imagename example) yakumosaki/glitch-soc"
-  echo "<tag>      : docker image tag  example) 20200713_1300"
-
-  exit 1
-fi
-
-# local docker image tag
-DOCKERHUB_IMAGENAME=$1
-DOCKER_TAG=$2
-
 # =====================================================================
 # config
 # =====================================================================
