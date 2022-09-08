@@ -39,6 +39,6 @@ jobs:
     - name: Build and push latest
       uses: docker/build-push-action@v3
       with:
-        context: x86_64/Dockerfile
+        file: x86_64/Dockerfile
         push: true
         tags: ${{ env.DOCKERHUB_IMAGENAME }}:latest,${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }}
