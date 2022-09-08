@@ -27,6 +27,7 @@ jobs:
         
         ${WORK}/prepare.sh
         
+        echo "WORK=$WORK" >> $GITHUB_ENV
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
         echo "DOCKERHUB_IMAGENAME=$DOCKERHUB_IMAGENAME" >> $GITHUB_ENV
         
@@ -40,5 +41,6 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         file: x86_64/Dockerfile
+        context: ${{ env.WORK }}
         push: true
         tags: ${{ env.DOCKERHUB_IMAGENAME }}:latest,${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }}
