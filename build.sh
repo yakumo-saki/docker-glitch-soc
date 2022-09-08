@@ -21,9 +21,6 @@ BASE_DIR=$(cd $(dirname $0); pwd)
 DOCKERFILE="$BASE_DIR/Dockerfile"
 MASTODON_DIR="$BASE_DIR/mastodon"
 
-# x86_64 / aarch64
-ARCH=`uname -m`
-
 # =====================================================================
 # functions
 # =====================================================================
@@ -84,15 +81,6 @@ sed -i -e "s/\+glitch/\+glitch_${DISP_VER}/" "${VERSION_RB}"
 
 echo "patch done"
 
-##
-process_banner "docker build"
-##
-
-cd $BASE_DIR
-echo "building docker image ${DOCKERHUB_IMAGENAME}:${DOCKER_TAG} on `pwd`"
-
-docker buildx build -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG -f $ARCH/Dockerfile .
-docker tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG $DOCKERHUB_IMAGENAME:latest
-
 echo ""
-echo "### BUILD SUCCESS ###"
+echo "### PREPARE SUCCESS ###"
+echo "You must docker build to build new image"
