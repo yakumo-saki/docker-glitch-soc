@@ -6,6 +6,7 @@ on:
     types:
       - webhook
 env:
+  TZ: "Asia/Tokyo"
   mastodon_url: "https://github.com/glitch-soc/mastodon.git"
 jobs:
   build:
