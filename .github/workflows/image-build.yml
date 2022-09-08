@@ -44,4 +44,4 @@ jobs:
         file: x86_64/Dockerfile
         context: ${{ env.WORK }}
         push: true
-        tags: ${{ env.DOCKERHUB_IMAGENAME }}:latest,${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }}
+        tags: ${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }},${{ env.DOCKERHUB_IMAGENAME }}:latest
