@@ -4,8 +4,7 @@
 DOCKER_TAG=`date '+%Y%m%d_%H'`
 DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc-aarch64"
 
-TOOT=/work/jenkins-scripts/foundation_admin_toots.sh
-WORK=/work/docker-build/docker-glitch-soc
+WORK=.
 
 # PULL
 cd ${WORK}
