@@ -17,13 +17,3 @@ fi
 cd ${WORK}/mastodon
 git reset --hard
 git pull
-
-
-# BUILD
-cd $WORK
-echo "building docker image ${DOCKERHUB_IMAGENAME}:${DOCKER_TAG} on `pwd`"
-
-
-# PUSH
-docker push $DOCKERHUB_IMAGENAME:$DOCKER_TAG
-docker push $DOCKERHUB_IMAGENAME:latest
