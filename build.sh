@@ -6,7 +6,7 @@ DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc-aarch64"
 
 GIT_REPO=https://github.com/glitch-soc/mastodon.git
 
-WORK=.
+WORK=`pwd`
 
 # PULL
 cd ${WORK}
