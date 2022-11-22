@@ -17,6 +17,8 @@ jobs:
       - run: uname -a
       - run: echo "Hello, Arm!"
       - checkout
+      - run: ls -l
+      - run: bash ./build.sh
 
 
 # Invoke jobs via workflows
