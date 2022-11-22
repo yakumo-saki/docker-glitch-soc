@@ -10,16 +10,36 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     machine:
       image: ubuntu-2004:202101-01
+      docker_layer_caching: true
     resource_class: arm.medium
 
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
-      - run: uname -a
-      - run: echo "Hello, Arm!"
+      - run:
+          name: "Determine tag name"
+          command: |
+            echo "export DOCKER_TAG=`date '+%Y%m%d_%H'`" >> "$BASH_ENV"
+            echo 'export DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc-aarch64"' >> "$BASH_ENV"
       - checkout
       - run: ls -l
-      - run: bash ./build.sh
-
+      - run:
+          name: "Run build.sh"
+          command: bash ./build.sh
+      - run:
+          name: "Run prepare.sh"
+          command: bash ./prepare.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
+      - run:
+          name: "Build"
+          command: |
+            ARCH=`uname -m`
+            docker buildx build -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG -f $ARCH/Dockerfile .
+            docker tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG $DOCKERHUB_IMAGENAME:latest
+      - run:
+          name: "Push"
+          command: |
+            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            docker push $DOCKERHUB_IMAGENAME:$DOCKER_TAG
+            docker push $DOCKERHUB_IMAGENAME:latest
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
