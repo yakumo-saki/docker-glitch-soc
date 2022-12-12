@@ -1,19 +1,15 @@
-FROM ruby:3.0.4-bullseye
+FROM ruby:3.0.5-bullseye
 
-ENV NODE_VER="16.15.0"
+ENV NODE_VER="16.18.1"
 ENV NODE_PLATFORM="linux-arm64"
 
-ENV INIT_VER="1.2.5"
-ENV INIT_PLATFORM="aarch64"
-ENV INIT_SUM="b7d648f97154a99c539b63c55979cd29f005f88430fb383007fe3458340b795e"
-
 ENV DIR_LIB="/usr/lib/aarch64-linux-gnu"
-
-ENV GITHUB_REPO=glitch-soc/mastodon
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  Completely same all arches after this line
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Add more PATHs to the PATH
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
@@ -22,6 +18,7 @@ ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
 RUN echo "*** phase 1 install nodejs" && \
     apt-get update && \
     apt-get -y --no-install-recommends install \
+        tini \
         wget python whois \
         git libicu-dev libidn11-dev \
         libpq-dev libprotobuf-dev protobuf-compiler \
@@ -52,14 +49,9 @@ ARG GID=991
 RUN echo "Etc/UTC" > /etc/localtime && \
     echo "not exec ln -s /opt/jemalloc/lib/* /usr/lib/" && \
     addgroup --gid $GID mastodon && \
-    useradd -m -u $UID -g $GID -d /opt/mastodon mastodon && \
-    echo "mastodon:`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256`" | chpasswd && \
+    useradd -l -m -u $UID -g $GID -d /opt/mastodon mastodon && \
+    echo "mastodon:$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256)" | chpasswd && \
     echo "done"
-
-# add dumb-init
-ADD https://github.com/Yelp/dumb-init/releases/download/v${INIT_VER}/dumb-init_${INIT_VER}_${INIT_PLATFORM} /dumb-init
-RUN echo "$INIT_SUM  dumb-init" | sha256sum -c - && \
-    chmod +x /dumb-init
 
 COPY --chown=mastodon:mastodon ./mastodon /opt/mastodon
 
@@ -99,4 +91,4 @@ RUN cd && \
 
 # Set the work dir and the container entry point
 WORKDIR /opt/mastodon
-ENTRYPOINT ["/dumb-init", "--"]
+ENTRYPOINT ["tini", "--"]
