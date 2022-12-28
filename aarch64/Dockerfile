@@ -1,6 +1,6 @@
-FROM ruby:3.0.5-bullseye
+FROM ruby:3.0.4-bullseye
 
-ENV NODE_VER="16.18.1"
+ENV NODE_VER="16.19.0"
 ENV NODE_PLATFORM="linux-arm64"
 
 ENV DIR_LIB="/usr/lib/aarch64-linux-gnu"
