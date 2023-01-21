@@ -1,4 +1,5 @@
-[![Build x86 GHA](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml/badge.svg)](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml) ![AArch64 CircleCI](https://circleci.com/gh/yakumo-saki/docker-glitch-soc.svg?style=shield)
+[![Build x86 GHA](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml/badge.svg)](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml) Build x86 GitHub Action  
+![AArch64 CircleCI](https://circleci.com/gh/yakumo-saki/docker-glitch-soc.svg?style=shield) Build AArch64 CircleCI  
 
 
 # Mastodon Glitch Edition Dockerfile and docker-compose
