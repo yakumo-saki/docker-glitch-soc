@@ -1,7 +1,9 @@
 FROM ruby:3.0.4-bullseye
 
-ENV NODE_VER="16.19.0"
 ENV NODE_PLATFORM="linux-arm64"
+
+ENV NODE_VER="18.14.0"
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 ENV DIR_LIB="/usr/lib/aarch64-linux-gnu"
 

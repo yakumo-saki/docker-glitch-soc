@@ -1,7 +1,9 @@
 FROM ruby:3.0.5-bullseye
 
-ENV NODE_VER="16.18.1"
+ENV NODE_VER="18.14.0"
 ENV NODE_PLATFORM="linux-x64"
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 ENV DIR_LIB="/usr/lib/x86_64-linux-gnu"
 
