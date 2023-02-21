@@ -1,4 +1,4 @@
-FROM ruby:3.0.5-bullseye
+FROM ruby:3.2-bullseye
 
 ENV NODE_VER="18.14.0"
 ENV NODE_PLATFORM="linux-x64"

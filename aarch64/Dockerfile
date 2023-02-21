@@ -1,4 +1,4 @@
-FROM ruby:3.0.4-bullseye
+FROM ruby:3.2-bullseye
 
 ENV NODE_PLATFORM="linux-arm64"
 
