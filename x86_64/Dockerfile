@@ -1,6 +1,6 @@
-FROM ruby:3.2-bullseye
+FROM ruby:3.0-bullseye
 
-ENV NODE_VER="18.14.0"
+ENV NODE_VER="18.15.0"
 ENV NODE_PLATFORM="linux-x64"
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
