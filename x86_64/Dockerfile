@@ -1,96 +1,99 @@
-FROM ruby:3.0-bullseye
+# syntax=docker/dockerfile:1.4
+# This needs to be bullseye-slim because the Ruby image is built on bullseye-slim
+ARG NODE_VERSION="16.19-bullseye-slim"
 
-ENV NODE_VER="18.15.0"
-ENV NODE_PLATFORM="linux-x64"
+FROM ghcr.io/moritzheiber/ruby-jemalloc:3.2.2-slim as ruby
+FROM node:${NODE_VERSION} as build
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+COPY --link --from=ruby /opt/ruby /opt/ruby
 
-ENV DIR_LIB="/usr/lib/x86_64-linux-gnu"
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  Completely same all arches after this line
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ENV DEBIAN_FRONTEND="noninteractive" \
+    PATH="${PATH}:/opt/ruby/bin"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Add more PATHs to the PATH
-ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin:/opt/mastodon/bin"
+WORKDIR /opt/mastodon
+COPY ./mastodon/Gemfile* ./mastodon/package.json ./mastodon/yarn.lock /opt/mastodon/
 
-# whois contains mkpasswd
-RUN echo "*** phase 1 install nodejs" && \
-    apt-get update && \
-    apt-get -y --no-install-recommends install \
-        tini \
-        wget python whois \
-        git libicu-dev libidn11-dev \
-        libpq-dev libprotobuf-dev protobuf-compiler \
-        libssl1.1 libpq5 imagemagick ffmpeg \
-        libicu67 libidn11 libyaml-0-2 \
-        file ca-certificates tzdata libreadline8 \
-        libjemalloc-dev libjemalloc2 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    cd ~ && \
-    wget -q https://nodejs.org/download/release/v${NODE_VER}/node-v${NODE_VER}-${NODE_PLATFORM}.tar.gz && \
-    tar xf node-v$NODE_VER-${NODE_PLATFORM}.tar.gz && \
-    rm node-v$NODE_VER-${NODE_PLATFORM}.tar.gz && \
-    mv node-v$NODE_VER-${NODE_PLATFORM} /opt/node  
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential \
+        ca-certificates \
+        git \
+        libicu-dev \
+        libidn11-dev \
+        libpq-dev \
+        libjemalloc-dev \
+        zlib1g-dev \
+        libgdbm-dev \
+        libgmp-dev \
+        libssl-dev \
+        libyaml-0-2 \
+        ca-certificates \
+        libreadline8 \
+        python3 \
+        shared-mime-info && \
+    bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle config set silence_root_warning true && \
+    bundle install -j"$(nproc)" && \
+    yarn install --pure-lockfile --production --network-timeout 600000 && \
+    yarn cache clean
 
-# Use jemalloc
-ENV LD_PRELOAD=${DIR_LIB}/libjemalloc.so.2
+FROM node:${NODE_VERSION}
 
-# install node.js
-RUN echo "*** install yarn, bundler etc..." && \
-    npm install -g yarn && \
-    gem install bundler && \
-    echo "done"
+ARG UID="991"
+ARG GID="991"
 
-# Create the mastodon user
-ARG UID=991
-ARG GID=991
-RUN echo "Etc/UTC" > /etc/localtime && \
-    echo "not exec ln -s /opt/jemalloc/lib/* /usr/lib/" && \
-    addgroup --gid $GID mastodon && \
-    useradd -l -m -u $UID -g $GID -d /opt/mastodon mastodon && \
-    echo "mastodon:$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 24 | mkpasswd -s -m sha-256)" | chpasswd && \
-    echo "done"
+COPY --link --from=ruby /opt/ruby /opt/ruby
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ENV DEBIAN_FRONTEND="noninteractive" \
+    PATH="${PATH}:/opt/ruby/bin:/opt/mastodon/bin"
+
+# Ignoreing these here since we don't want to pin any versions and the Debian image removes apt-get content after use
+# hadolint ignore=DL3008,DL3009
+RUN apt-get update && \
+    echo "Etc/UTC" > /etc/localtime && \
+    groupadd -g "${GID}" mastodon && \
+    useradd -l -u "$UID" -g "${GID}" -m -d /opt/mastodon mastodon && \
+    apt-get -y --no-install-recommends install whois \
+        wget \
+        procps \
+        libssl1.1 \
+        libpq5 \
+        imagemagick \
+        ffmpeg \
+        libjemalloc2 \
+        libicu67 \
+        libidn11 \
+        libyaml-0-2 \
+        file \
+        ca-certificates \
+        tzdata \
+        libreadline8 \
+        tini && \
+    ln -s /opt/mastodon /mastodon
+
+# Note: no, cleaning here since Debian does this automatically
+# See the file /etc/apt/apt.conf.d/docker-clean within the Docker image's filesystem
 
 COPY --chown=mastodon:mastodon ./mastodon /opt/mastodon
+COPY --chown=mastodon:mastodon --from=build /opt/mastodon /opt/mastodon
 
-# create override dir to replace files
-RUN mkdir /opt/mastodon/public/override && \
-    chown -R mastodon:mastodon /opt/mastodon
-
-# Install mastodon runtime deps
-RUN ln -s /opt/mastodon /mastodon && \
-    rm -rvf /var/cache && \
-    rm -rvf /var/lib/apt/lists/* && \
-    cd /opt/mastodon && \
-    bundle config set without 'development test' && \
-    bundle env && \
-    bundle install -j$(nproc) --no-deployment
-
-# 20210214
-# due to rdf gem's some files are not readable from others
-RUN chmod -R o+r /usr/local/bundle/gems/
+ENV RAILS_ENV="production" \
+    NODE_ENV="production" \
+    RAILS_SERVE_STATIC_FILES="true" \
+    BIND="0.0.0.0"
 
 # Set the run user
 USER mastodon
+WORKDIR /opt/mastodon
 
-# Tell rails to serve static files
-ENV RAILS_SERVE_STATIC_FILES="true"
-ENV RAILS_ENV="production"
-ENV NODE_ENV="production"
-
-RUN cd && \
-    yarn install --pure-lockfile && \
-    yarn cache clean && \ 
-    npx browserslist@latest --update-db && \
-    cd && \
-    export OTP_SECRET=precompile_placeholder && \
-    export SECRET_KEY_BASE=precompile_placeholder && \
-    bundle exec rake assets:precompile
+# Precompile assets
+RUN OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile
 
 # Set the work dir and the container entry point
-WORKDIR /opt/mastodon
-ENTRYPOINT ["tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
+EXPOSE 3000 4000
