@@ -6,7 +6,7 @@
 
 ## news
 
-* 2023/04/06 replace Dockerfile with glitch-soc's. This improve stability on my environment.
+* 2023/04/06 replace Dockerfile with glitch-soc's. This improve stability on my environment. And also container image size become 1/2 (1GB -> 550MB)
 * 2023/04/03 build is failling. Checking for reason. and has (issue)[https://github.com/yakumo-saki/docker-glitch-soc/issues/7] ?
 * 2022/07/06 x86_64 docker image build is back to normal.
 * 2022/06/11 aarch64 docker image build is started. (thanks to Oracle Cloud Free tier)
