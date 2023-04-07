@@ -4,6 +4,9 @@
 
 # Mastodon Glitch Edition Dockerfile and docker-compose
 
+Mastodon glitch edition official image is available:
+https://github.com/glitch-soc/mastodon/pkgs/container/mastodon
+
 ## news
 
 * 2023/04/06 replace Dockerfile with glitch-soc's. This improve stability on my environment. And also container image size become 1/2 (1GB -> 550MB)
