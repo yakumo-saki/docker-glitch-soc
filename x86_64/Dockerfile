@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1.4
-# This needs to be bullseye-slim because the Ruby image is built on bullseye-slim
-ARG NODE_VERSION="20.6-bookworm-slim"
+ARG NODE_VERSION="20.7-bookworm-slim"
 
 FROM ghcr.io/moritzheiber/ruby-jemalloc:3.2.2-slim as ruby
 FROM node:${NODE_VERSION} as build
