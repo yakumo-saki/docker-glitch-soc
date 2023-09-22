@@ -17,6 +17,7 @@ COPY ./mastodon/Gemfile* ./mastodon/package.json ./mastodon/yarn.lock /opt/masto
 
 # hadolint ignore=DL3008
 RUN apt-get update && \
+    apt-get -yq dist-upgrade && \
     apt-get install -y --no-install-recommends build-essential \
         ca-certificates \
         git \
