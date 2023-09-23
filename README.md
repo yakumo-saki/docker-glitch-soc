@@ -16,7 +16,7 @@ My build:
 
 Date is in JST (GMT+9)
 
-* 2023/09/23 build is back to normal. docker image is now based on bookworm (debian 12).
+* 2023/09/23 build is back to normal. docker image is now based on bookworm (debian 12). Thank you @darkorb !
 * 2023/09/20 build is failling x86_64 and aarch64 images.
 * 2023/04/06 replace Dockerfile with glitch-soc's. This improve stability on my environment. And also container image size become 1/2 (1GB -> 550MB)
 * 2023/04/03 build is failling. Checking for reason. and has (issue)[https://github.com/yakumo-saki/docker-glitch-soc/issues/7] ?
