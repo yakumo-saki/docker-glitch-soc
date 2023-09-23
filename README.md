@@ -9,8 +9,8 @@ https://github.com/glitch-soc/mastodon/pkgs/container/mastodon
 
 My build:
 
-* yakumosaki/glitch-soc-aarch64
-* yakumosaki/glitch-soc
+* yakumosaki/glitch-soc-aarch64 ( https://hub.docker.com/r/yakumosaki/glitch-soc-aarch64 )
+* yakumosaki/glitch-soc ( https://hub.docker.com/r/yakumosaki/glitch-soc )
 
 ## news
 
