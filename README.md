@@ -4,7 +4,7 @@
 
 # Mastodon Glitch Edition Dockerfile and docker-compose
 
-Mastodon glitch edition official image is available:
+Mastodon glitch edition official image is available:  
 https://github.com/glitch-soc/mastodon/pkgs/container/mastodon
 
 ## news
