@@ -29,7 +29,7 @@ jobs:
         ${WORK}/prepare.sh
 
         # move mastodon under dockerfile.
-        mv mastodon x86_64/
+        mv ${WORK}/mastodon ${WORK}/x86_64/
         
         echo "WORK=$WORK" >> $GITHUB_ENV
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
@@ -45,6 +45,6 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         file: x86_64/Dockerfile
-        context: ${{ env.WORK }}
+        context: ${{ env.WORK }}/x86_64
         push: true
         tags: ${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }},${{ env.DOCKERHUB_IMAGENAME }}:latest
