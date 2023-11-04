@@ -24,9 +24,12 @@ jobs:
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
-        git clone ${{ env.mastodon_url }}
+        git clone --depth=1 ${{ env.mastodon_url }}
         
         ${WORK}/prepare.sh
+
+        # move mastodon under dockerfile.
+        mv mastodon x86_64/
         
         echo "WORK=$WORK" >> $GITHUB_ENV
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV

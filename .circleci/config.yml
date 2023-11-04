@@ -32,6 +32,9 @@ jobs:
           name: "Run prepare.sh"
           command: bash ./prepare.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
       - run:
+          name: "Move mastodon under aarm"
+          command: mv ./mastodon ./aarch64/ 
+      - run:
           name: "Build"
           command: |
             ARCH=`uname -m`
