@@ -30,7 +30,12 @@ jobs:
           command: bash ./build.sh
       - run:
           name: "Run prepare.sh"
-          command: bash ./prepare.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
+          command: |
+            bash ./prepare.sh $DOCKERHUB_IMAGENAME $DOCKER_TAG
+            GIT_COMMIT=`git rev-parse --short HEAD`
+            # version string shown in Mastodon UI, etc.
+            DISP_VER="`date '+%m%d'_${GIT_COMMIT:0:7}`"
+            echo 'export CUSTOM_IMG=$DISP_VER' >> "$BASH_ENV"
       - run:
           name: "Move mastodon under aarm"
           command: mv ./mastodon ./aarch64/ 
@@ -39,7 +44,7 @@ jobs:
           command: |
             ARCH=`uname -m`
             cd $ARCH
-            docker buildx build -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG .
+            docker buildx build --build-arg CUSTOM_IMG=$CUSTOM_IMG -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG .
             docker tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG $DOCKERHUB_IMAGENAME:latest
       - run:
           name: "Push"

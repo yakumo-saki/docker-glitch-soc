@@ -41,7 +41,12 @@ RUN apt-get update && \
     yarn install --pure-lockfile --production --network-timeout 600000 && \
     yarn cache clean
 
+# Running image
 FROM node:${NODE_VERSION}
+
+# use docker --build-arg CUSTOM_IMG="MY_IMG" to show custom version string
+ARG CUSTOM_IMG=""
+ENV MASTODON_VERSION_METADATA=${CUSTOM_IMG}
 
 ARG UID="991"
 ARG GID="991"

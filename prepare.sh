@@ -57,10 +57,10 @@ DISP_VER="`date '+%m%d'_${GIT_COMMIT:0:7}`"
 process_banner "patch"
 ##
 
-small_banner "edit TAG.rb to change version string"
-VERSION_RB=${MASTODON_DIR}/lib/mastodon/version.rb
-echo "add TAG suffix $DISP_VER"
-sed -i -e "s/\+glitch/\+glitch_${DISP_VER}/" "${VERSION_RB}"
+# small_banner "edit TAG.rb to change version string"
+# VERSION_RB=${MASTODON_DIR}/lib/mastodon/version.rb
+# echo "add TAG suffix $DISP_VER"
+# sed -i -e "s/\+glitch/\+glitch_${DISP_VER}/" "${VERSION_RB}"
 
 #small_banner "patch Gemfile.lock"
 # echo "gem 'mimemagic', '~> 0.3.10'" >> Gemfile
