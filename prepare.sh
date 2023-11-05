@@ -68,6 +68,7 @@ process_banner "patch"
 
 echo "add MASTODON_VERSION_METADATA"
 sed -i -e "s/!!!!!!REPLACE_VER_METADATA!!!!!!/${DISP_VER}/" "${BASE_DIR}/aarch64/Dockerfile"
+sed -i -e "s/!!!!!!REPLACE_VER_METADATA!!!!!!/${DISP_VER}/" "${BASE_DIR}/x86_64/Dockerfile"
 
 
 echo "patch done"
