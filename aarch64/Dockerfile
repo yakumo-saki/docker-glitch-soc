@@ -45,8 +45,7 @@ RUN apt-get update && \
 FROM node:${NODE_VERSION}
 
 # use docker --build-arg CUSTOM_IMG="MY_IMG" to show custom version string
-ARG CUSTOM_IMG=""
-ENV MASTODON_VERSION_METADATA=${CUSTOM_IMG}
+ENV MASTODON_VERSION_METADATA="!!!!!!REPLACE_VER_METADATA!!!!!!"
 
 ARG UID="991"
 ARG GID="991"

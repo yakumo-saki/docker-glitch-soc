@@ -43,6 +43,8 @@ RUN bundle config set --local deployment 'true' && \
 
 FROM node:${NODE_VERSION}
 
+ENV MASTODON_VERSION_METADATA="!!!!!!REPLACE_VER_METADATA!!!!!!"
+
 ARG UID="991"
 ARG GID="991"
 

@@ -37,10 +37,10 @@ function small_banner() {
 
 # is mastodon cloned ? 
 if [ ! -d $MASTODON_DIR ];then
-  echo "FATAL: 'build' directory not found."
-  echo "Please run command below on ${BASE_DIR}"
-  echo "git clone https://github.com/glitch-soc/mastodon.git mastodon"
-  exit 16
+    echo "FATAL: 'build' directory not found."
+    echo "Please run command below on ${BASE_DIR}"
+    echo "git clone https://github.com/glitch-soc/mastodon.git mastodon"
+    exit 16
 fi
 
 # get mastodon commit hash.
@@ -65,6 +65,10 @@ process_banner "patch"
 #small_banner "patch Gemfile.lock"
 # echo "gem 'mimemagic', '~> 0.3.10'" >> Gemfile
 # sed -i s/mimemagic.*0.3.5/"mimemagic (0.3.10"/ Gemfile.lock
+
+echo "add MASTODON_VERSION_METADATA"
+sed -i -e "s/!!!!!!REPLACE_VER_METADATA!!!!!!/${DISP_VER}/" "${BASE_DIR}/aarch64/Dockerfile"
+
 
 echo "patch done"
 
