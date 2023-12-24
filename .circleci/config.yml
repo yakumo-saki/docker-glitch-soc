@@ -26,8 +26,8 @@ jobs:
       - checkout
       - run: ls -l
       - run:
-          name: "Run build.sh"
-          command: bash ./build.sh
+          name: "Run pull.sh"
+          command: bash ./pull.sh
       - run:
           name: "Run prepare.sh"
           command: |
