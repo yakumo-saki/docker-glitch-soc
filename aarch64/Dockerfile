@@ -13,6 +13,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /opt/mastodon
 COPY ./mastodon/Gemfile* ./mastodon/package.json ./mastodon/yarn.lock /opt/mastodon/
+COPY ./mastodon/.yarn/patches/* /opt/mastodon/.yarn/patches/
 
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -20,11 +21,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential \
         ca-certificates \
         git \
+        g++ \
+        gcc \
         libicu-dev \
         libidn-dev \
         libpq-dev \
         libjemalloc-dev \
-        zlib1g-dev \
         libgdbm-dev \
         libgmp-dev \
         libssl-dev \
@@ -33,19 +35,25 @@ RUN apt-get update && \
         ca-certificates \
         libreadline8 \
         python3 \
-        shared-mime-info && \
-    bundle config set --local deployment 'true' && \
+        shared-mime-info \
+        zlib1g-dev
+
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --global frozen "true" && \
+    bundle config set --global cache_all "false" && \
     bundle config set --local without 'development test' && \
     bundle config set silence_root_warning true && \
-    bundle install -j"$(nproc)" && \
-    yarn install --pure-lockfile --production --network-timeout 600000 && \
-    yarn cache clean
+    bundle install -j"$(nproc)"
+
+RUN corepack enable && \
+    yarn workspaces focus --all --production && \
+    yarn install --network-timeout 600000 
 
 # Running image
 FROM node:${NODE_VERSION}
 
-# use docker --build-arg CUSTOM_IMG="MY_IMG" to show custom version string
 ENV MASTODON_VERSION_METADATA="!!!!!!REPLACE_VER_METADATA!!!!!!"
+ENV MALLOC_CONF="narenas:2,background_thread:true,thp:never,dirty_decay_ms:1000,muzzy_decay_ms:0"
 
 ARG UID="991"
 ARG GID="991"
@@ -93,13 +101,23 @@ ENV RAILS_ENV="production" \
     RAILS_SERVE_STATIC_FILES="true" \
     BIND="0.0.0.0"
 
+# Precompile assets
+RUN cd /opt/mastodon && \
+    corepack enable && \ 
+    yarn workspaces focus --all --production && \
+    OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder ./bin/rails assets:precompile
+
+RUN \
+# Pre-create and chown system volume to Mastodon user
+  mkdir -p /opt/mastodon/public/system && \
+  chown mastodon:mastodon /opt/mastodon/public/system && \
+# Set Mastodon user as owner of tmp folder
+  chown -R mastodon:mastodon /opt/mastodon/tmp
+
 # Set the run user
 USER mastodon
 WORKDIR /opt/mastodon
 
-# Precompile assets
-RUN OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder ./bin/rails assets:precompile
-
 # Set the work dir and the container entry point
-ENTRYPOINT ["/usr/bin/tini", "--"]
 EXPOSE 3000 4000
+ENTRYPOINT ["/usr/bin/tini", "--"]
