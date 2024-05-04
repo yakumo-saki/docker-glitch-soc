@@ -41,7 +41,7 @@ jobs:
         mv ${WORK}/mastodon ${WORK}/x86_64/
 
         echo "ls of ${WORK}/x86_64/"
-        ls ${WORK}/x86_64/
+        ls -l ${WORK}/x86_64/
         
         echo "WORK=$WORK" >> $GITHUB_ENV
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
@@ -56,7 +56,7 @@ jobs:
     - name: Build and push latest
       uses: docker/build-push-action@v5
       with:
-        file: x86_64/Dockerfile
+        file: ${{ env.WORK }}/x86_64/Dockerfile
         context: ${{ env.WORK }}/x86_64
         push: true
         tags: ${{ env.DOCKERHUB_IMAGENAME }}:${{ env.DOCKER_TAG }},${{ env.DOCKERHUB_IMAGENAME }}:latest
