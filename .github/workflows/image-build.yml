@@ -34,7 +34,7 @@ jobs:
         # 2024/05/05 use action/checkout
         # git clone --depth=1 ${{ env.mastodon_url }}
         
-        ${WORK}/prepare.sh
+        bash ${WORK}/prepare.sh
 
         # move mastodon under dockerfile.
         mv ${WORK}/mastodon ${WORK}/x86_64/
