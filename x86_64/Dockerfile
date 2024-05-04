@@ -70,7 +70,7 @@ ENV DEBIAN_FRONTEND="noninteractive" \
     NODE_ENV="production" \
     RAILS_SERVE_STATIC_FILES="true" \
     BIND="0.0.0.0"
-    
+
 # Ignoreing these here since we don't want to pin any versions and the Debian image removes apt-get content after use
 # hadolint ignore=DL3008,DL3009
 RUN apt-get update && \
@@ -104,7 +104,9 @@ COPY --chown=mastodon:mastodon --from=build /opt/mastodon /opt/mastodon
 
 # Precompile assets
 WORKDIR /opt/mastodon
-RUN corepack enable && \ 
+
+RUN \
+    corepack enable && \ 
     yarn workspaces focus --all --production && \
     ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=precompile_placeholder \
     ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=precompile_placeholder \
@@ -114,15 +116,14 @@ RUN corepack enable && \
     ./bin/rails assets:precompile
 
 RUN \
-# Pre-create and chown system volume to Mastodon user
-  mkdir -p /opt/mastodon/public/system && \
-  chown mastodon:mastodon /opt/mastodon/public/system && \
-# Set Mastodon user as owner of tmp folder
-  chown -R mastodon:mastodon /opt/mastodon/tmp
+    # Pre-create and chown system volume to Mastodon user
+    mkdir -p /opt/mastodon/public/system && \
+    chown mastodon:mastodon /opt/mastodon/public/system && \
+    # Set Mastodon user as owner of tmp folder
+    chown -R mastodon:mastodon /opt/mastodon/tmp
 
 # Set the run user
 USER mastodon
-WORKDIR /opt/mastodon
 
 # Set the work dir and the container entry point
 EXPOSE 3000 4000
