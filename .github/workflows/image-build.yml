@@ -26,6 +26,7 @@ jobs:
     - name: 'Build glitch-soc docker image'
       run: |
         WORK="$GITHUB_WORKSPACE/docker-glitch-soc"
+        echo "Work dir is $WORK"
         
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
@@ -38,19 +39,22 @@ jobs:
 
         # move mastodon under dockerfile.
         mv ${WORK}/mastodon ${WORK}/x86_64/
+
+        echo "ls of ${WORK}/x86_64/"
+        ls ${WORK}/x86_64/
         
         echo "WORK=$WORK" >> $GITHUB_ENV
         echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
         echo "DOCKERHUB_IMAGENAME=$DOCKERHUB_IMAGENAME" >> $GITHUB_ENV
         
     - name: Login to DockerHub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and push latest
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         file: x86_64/Dockerfile
         context: ${{ env.WORK }}/x86_64
