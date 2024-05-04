@@ -16,6 +16,7 @@ My build:
 
 Date is in JST (GMT+9)
 
+* 2024/05/05 Build is back to normal. update ruby to 3.2.3. and YJIT is enabled.
 * 2023/12/24 Merry X'mas. build is back to normal. Official docker image is splitted to web / Streaming. But my image is not splitted.
 * 2023/09/23 build is back to normal. docker image is now based on bookworm (debian 12). Thank you @darkorb !
 * 2023/09/20 build is failling x86_64 and aarch64 images.
