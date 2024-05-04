@@ -15,16 +15,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: 'docker-glitch-soc'
+
+    - uses: actions/checkout@v4
+      with:
+        repository: 'https://github.com/glitch-soc/mastodon.git'
+        path: 'docker-glitch-soc/mastodon'
 
     - name: 'Build glitch-soc docker image'
       run: |
-        WORK=`pwd`
+        WORK="$GITHUB_WORKSPACE/docker-glitch-soc"
         
         # local docker image tag
         DOCKER_TAG=`date '+%Y%m%d_%H'`
         DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"
 
-        git clone --depth=1 ${{ env.mastodon_url }}
+        # 2024/05/05 use action/checkout
+        # git clone --depth=1 ${{ env.mastodon_url }}
         
         ${WORK}/prepare.sh
 
