@@ -1,0 +1,5 @@
+{
+    "circleci.persistedProjectSelection": [
+        "gh/yakumo-saki/docker-glitch-soc"
+    ]
+}
