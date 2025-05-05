@@ -33,6 +33,7 @@ RUN apt-get update && \
         libssl-dev \
         libyaml-0-2 \
         libyaml-dev \
+        libvips42 \
         ca-certificates \
         libreadline8 \
         python3 \

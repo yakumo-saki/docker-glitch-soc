@@ -88,6 +88,8 @@ RUN apt-get update && \
         libicu72 \
         libidn12 \
         libyaml-0-2 \
+        libyaml-dev \
+        libvips42 \
         file \
         ca-certificates \
         tzdata \
