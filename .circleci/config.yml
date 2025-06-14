@@ -22,7 +22,7 @@ jobs:
           name: "Determine tag name"
           command: |
             echo "export DOCKER_TAG=`date '+%Y%m%d_%H'`" >> "$BASH_ENV"
-            echo 'export DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc-aarch64"' >> "$BASH_ENV"
+            echo 'export DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"' >> "$BASH_ENV"
       - checkout
       - run: ls -l
       - run:
