@@ -34,7 +34,6 @@ RUN apt-get update && \
         libyaml-0-2 \
         libyaml-dev \
         libvips42 \
-        ca-certificates \
         libreadline8 \
         python3 \
         shared-mime-info \
@@ -90,6 +89,7 @@ RUN apt-get update && \
         libicu72 \
         libidn12 \
         libyaml-0-2 \
+        libvips42 \
         file \
         ca-certificates \
         tzdata \

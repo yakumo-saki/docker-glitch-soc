@@ -33,7 +33,6 @@ RUN apt-get update && \
         libssl-dev \
         libyaml-0-2 \
         libyaml-dev \
-        ca-certificates \
         libreadline8 \
         python3 \
         shared-mime-info \
