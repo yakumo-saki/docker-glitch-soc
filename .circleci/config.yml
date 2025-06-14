@@ -44,7 +44,7 @@ jobs:
           command: |
             ARCH=`uname -m`
             cd $ARCH
-            docker buildx build --build-arg CUSTOM_IMG=$CUSTOM_IMG -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG .
+            docker buildx build --platform linux/arm64/v8 --build-arg CUSTOM_IMG=$CUSTOM_IMG -t $DOCKERHUB_IMAGENAME:$DOCKER_TAG .
             docker tag $DOCKERHUB_IMAGENAME:$DOCKER_TAG $DOCKERHUB_IMAGENAME:latest
       - run:
           name: "Push"
