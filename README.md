@@ -5,6 +5,7 @@
 # Mastodon Glitch Edition Dockerfile and docker-compose
 
 Mastodon glitch edition official image is available:  
+(Use official image is recommended)  
 https://github.com/glitch-soc/mastodon/pkgs/container/mastodon
 
 My build:
@@ -16,6 +17,7 @@ My build:
 
 Date is in JST (GMT+9)
 
+* 2025/06/14 Update Ruby 3.4.4
 * 2024/05/05 Build is back to normal. update ruby to 3.2.3. and YJIT is enabled.
 * 2023/12/24 Merry X'mas. build is back to normal. Official docker image is splitted to web / Streaming. But my image is not splitted.
 * 2023/09/23 build is back to normal. docker image is now based on bookworm (debian 12). Thank you @darkorb !

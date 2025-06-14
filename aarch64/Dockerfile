@@ -2,7 +2,7 @@
 ARG NODE_VERSION="lts-bookworm-slim"
 ARG RUBY_YJIT_ENABLE="1"
 
-FROM ghcr.io/moritzheiber/ruby-jemalloc:3.3.1-slim as ruby
+FROM ghcr.io/moritzheiber/ruby-jemalloc:3.4.4-slim as ruby
 FROM node:${NODE_VERSION} as build
 
 COPY --link --from=ruby /opt/ruby /opt/ruby
