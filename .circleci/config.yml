@@ -13,6 +13,9 @@ jobs:
       docker_layer_caching: true
     resource_class: arm.medium
 
+    environment:
+      TZ: "Asia/Tokyo"
+
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - run:
