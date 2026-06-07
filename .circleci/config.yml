@@ -109,7 +109,7 @@ jobs:
                 | .digest')
 
 
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin docker.io
 
             docker manifest create ${IMG}:latest \
                                   ${IMG}:latest_arm64@${ARM64_DIGEST} \
