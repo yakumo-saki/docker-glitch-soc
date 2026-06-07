@@ -41,7 +41,10 @@ commands:
           name: "Build"
           command: |
             ARCH=`uname -m`
-            docker buildx build --platform ${DOCKER_PLATFORM} --build-arg CUSTOM_IMG=${CUSTOM_IMG} -t $DOCKERHUB_IMAGENAME:${DOCKER_TAG} .
+            docker buildx build --platform ${DOCKER_PLATFORM} \
+                                --provenance=false --sbom=false \
+                                --build-arg CUSTOM_IMG=${CUSTOM_IMG} \
+                                -t $DOCKERHUB_IMAGENAME:${DOCKER_TAG} .
             docker tag ${DOCKERHUB_IMAGENAME}:${DOCKER_TAG} ${DOCKERHUB_IMAGENAME}:${DOCKER_TAG_LATEST}
       - run:
           name: "Push"
@@ -98,18 +101,8 @@ jobs:
           command: |
             export IMG="yakumosaki/glitch-soc"
 
-            ARM64_DIGEST=$(docker buildx imagetools inspect ${IMG}:latest_arm64 --raw \
-              | jq -r '.manifests[]
-                | select(.platform.os=="linux" and .platform.architecture=="arm64")
-                | .digest')
-
-            AMD64_DIGEST=$(docker buildx imagetools inspect ${IMG}:latest_amd64 --raw \
-              | jq -r '.manifests[]
-                | select(.platform.os=="linux" and .platform.architecture=="amd64")
-                | .digest')
-
-
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin docker.io
+            echo "Docker login ok"
 
             docker manifest create ${IMG}:latest \
                                   ${IMG}:latest_arm64@${ARM64_DIGEST} \
