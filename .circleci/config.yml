@@ -105,8 +105,8 @@ jobs:
             echo "Docker login ok"
 
             docker manifest create ${IMG}:latest \
-                                  ${IMG}:latest_arm64@${ARM64_DIGEST} \
-                                  ${IMG}:latest_amd64@${AMD64_DIGEST}
+                                   ${IMG}:latest_arm64 \
+                                   ${IMG}:latest_amd64
             docker manifest push ${IMG}:latest
 
 # Invoke jobs via workflows
