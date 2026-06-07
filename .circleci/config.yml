@@ -98,10 +98,22 @@ jobs:
           command: |
             export IMG="yakumosaki/glitch-soc"
 
-            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            ARM64_DIGEST=$(docker buildx imagetools inspect ${IMG}:latest_arm64 --raw \
+              | jq -r '.manifests[]
+                | select(.platform.os=="linux" and .platform.architecture=="arm64")
+                | .digest')
+
+            AMD64_DIGEST=$(docker buildx imagetools inspect ${IMG}:latest_amd64 --raw \
+              | jq -r '.manifests[]
+                | select(.platform.os=="linux" and .platform.architecture=="amd64")
+                | .digest')
+
+
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+
             docker manifest create ${IMG}:latest \
-                                  ${IMG}:latest_arm64 \
-                                  ${IMG}:latest_amd64
+                                  ${IMG}:latest_arm64@${ARM64_DIGEST} \
+                                  ${IMG}:latest_amd64@${AMD64_DIGEST}
             docker manifest push ${IMG}:latest
 
 # Invoke jobs via workflows
