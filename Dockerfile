@@ -187,6 +187,7 @@ RUN \
 FROM node:${NODE_VERSION}
 
 ENV MASTODON_VERSION_METADATA="!!!!!!REPLACE_VER_METADATA!!!!!!"
+ENV SOURCE_COMMIT="!!!!!!REPLACE_SOURCE_COMMIT!!!!!!"
 ENV MALLOC_CONF="narenas:2,background_thread:true,thp:never,dirty_decay_ms:1000,muzzy_decay_ms:0"
 ARG UID="991"
 ARG GID="991"
