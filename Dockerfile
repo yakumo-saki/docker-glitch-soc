@@ -116,7 +116,7 @@ FROM build AS libvips
 
 # libvips version to compile, change with [--build-arg VIPS_VERSION="8.15.2"]
 # renovate: datasource=github-releases depName=libvips packageName=libvips/libvips
-ARG VIPS_VERSION=8.17.3
+ARG VIPS_VERSION=8.18.3
 # libvips download URL, change with [--build-arg VIPS_URL="https://github.com/libvips/libvips/releases/download"]
 ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 
