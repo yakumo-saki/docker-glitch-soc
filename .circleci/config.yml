@@ -14,6 +14,14 @@ executors:
       docker_layer_caching: false
     resource_class: large
 
+# Shared anchor
+#   environment:
+#      <<: *common_env
+references:
+  common_env: &common_env
+    TZ: "Asia/Tokyo"
+    DOCKERHUB_IMAGENAME: "yakumosaki/glitch-soc"
+
 commands:
   # Define reusable commands here.
   # See: https://circleci.com/docs/reference/reusing-config/
@@ -23,9 +31,7 @@ commands:
           name: "determin tag names"
           command: |
             echo 'export DOCKER_TAG="`date '+%Y%m%d'`${DOCKER_TAG_SUFFIX}"' >> "$BASH_ENV"
-
             echo 'export DOCKER_TAG_LATEST="latest${DOCKER_TAG_SUFFIX}"' >> "$BASH_ENV"
-            echo 'export DOCKERHUB_IMAGENAME="yakumosaki/glitch-soc"' >> "$BASH_ENV"
       - run:
           name: "Run pull.sh"
           command: bash ./pull.sh
@@ -36,7 +42,7 @@ commands:
             GIT_COMMIT=`git rev-parse --short HEAD`
             # version string shown in Mastodon UI, etc.
             DISP_VER="`date '+%m%d'_${GIT_COMMIT:0:7}`"
-            echo 'export CUSTOM_IMG=$DISP_VER' >> "$BASH_ENV"
+            echo "export CUSTOM_IMG='$DISP_VER'" >> "$BASH_ENV"
       - run:
           name: "Build"
           command: |
@@ -60,7 +66,7 @@ jobs:
   build-image-arm64:
     executor: arm64
     environment:
-      TZ: "Asia/Tokyo"
+      <<: *common_env
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - run:
@@ -74,7 +80,7 @@ jobs:
   build-image-amd64:
     executor: amd64
     environment:
-      TZ: "Asia/Tokyo"
+      <<: *common_env
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - run:
@@ -89,17 +95,16 @@ jobs:
   push-latest-tag:
     machine:
       image: ubuntu-2204:current
-      docker_layer_caching: true
+      docker_layer_caching: false
     resource_class: medium
 
     environment:
-      TZ: "Asia/Tokyo"
-
+      <<: *common_env
     steps:
       - run:
           name: "push latest manifest"
           command: |
-            export IMG="yakumosaki/glitch-soc"
+            export IMG="${DOCKERHUB_IMAGENAME}"
 
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin docker.io
             echo "Docker login ok"
