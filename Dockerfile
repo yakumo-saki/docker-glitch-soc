@@ -42,7 +42,7 @@ set -e
 apt-get update
 apt-get install -y --no-install-recommends \
     build-essential ca-certificates git g++ gcc libidn11-dev libpq-dev \
-    libjemalloc-dev libgdbm-dev libvips42 libreadline8 python3 \
+    libjemalloc-dev libgdbm-dev libreadline8 python3 \
     shared-mime-info zlib1g-dev autoconf automake cmake libglib2.0-dev \
     libgmp-dev libicu-dev libidn-dev libssl-dev libtool libyaml-dev meson \
     nasm pkg-config xz-utils libcgif-dev libexif-dev libexpat1-dev \
