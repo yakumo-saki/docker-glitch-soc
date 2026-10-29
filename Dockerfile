@@ -202,8 +202,8 @@ echo "Etc/UTC" > /etc/localtime
 groupadd -g "${GID}" mastodon
 useradd -l -u "$UID" -g "${GID}" -m -d /opt/mastodon mastodon
 apt-get -y --no-install-recommends install \
-    whois curl wget procps libssl3 libpq5 imagemagick ffmpeg \
-    libjemalloc2 libidn12 libyaml-0-2 libvips42 file ca-certificates \
+    whois curl wget procps libssl3 libpq5 imagemagick \
+    libjemalloc2 libidn12 libyaml-0-2 file ca-certificates \
     tzdata libreadline8 tini libexpat1 libglib2.0-0t64 libicu76 \
     libidn12 libpq5 libreadline8t64 libssl3t64 libyaml-0-2 \
     libcgif0 libexif12 libheif1 libhwy1t64 libimagequant0 \
