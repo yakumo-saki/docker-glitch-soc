@@ -37,76 +37,37 @@ WORKDIR /opt/mastodon
 COPY ./mastodon/Gemfile* ./mastodon/package.json ./mastodon/yarn.lock /opt/mastodon/
 
 # hadolint ignore=DL3008
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential \
-        ca-certificates \
-        git \
-        g++ \
-        gcc \
-        libidn11-dev \
-        libpq-dev \
-        libjemalloc-dev \
-        libgdbm-dev \
-        libvips42 \
-        libreadline8 \
-        python3 \
-        shared-mime-info \
-        zlib1g-dev \
-        # from mastodon's builder: dockerfile:L137
-        autoconf \
-        automake \
-        build-essential \
-        cmake \
-        git \
-        libgdbm-dev \
-        libglib2.0-dev \
-        libgmp-dev \
-        libicu-dev \
-        libidn-dev \
-        libpq-dev \
-        libssl-dev \
-        libtool \
-        libyaml-dev \
-        meson \
-        nasm \
-        pkg-config \
-        shared-mime-info \
-        xz-utils \
-        # libvips components
-        libcgif-dev \
-        libexif-dev \
-        libexpat1-dev \
-        libgirepository1.0-dev \
-        libheif-dev \
-        libhwy-dev \
-        libimagequant-dev \
-        libjpeg62-turbo-dev \
-        liblcms2-dev \
-        libspng-dev \
-        libtiff-dev \
-        libwebp-dev \
-        # ffmpeg components
-        libdav1d-dev \
-        liblzma-dev \
-        libmp3lame-dev \
-        libopus-dev \
-        libsnappy-dev \
-        libvorbis-dev \
-        libvpx-dev \
-        libx264-dev \
-        libx265-dev \
-        ;
+RUN <<EOF
+set -e
+apt-get update
+apt-get install -y --no-install-recommends \
+    build-essential ca-certificates git g++ gcc libidn11-dev libpq-dev \
+    libjemalloc-dev libgdbm-dev libvips42 libreadline8 python3 \
+    shared-mime-info zlib1g-dev autoconf automake cmake libglib2.0-dev \
+    libgmp-dev libicu-dev libidn-dev libssl-dev libtool libyaml-dev meson \
+    nasm pkg-config xz-utils libcgif-dev libexif-dev libexpat1-dev \
+    libgirepository1.0-dev libheif-dev libhwy-dev libimagequant-dev \
+    libjpeg62-turbo-dev liblcms2-dev libspng-dev libtiff-dev libwebp-dev \
+    libdav1d-dev liblzma-dev libmp3lame-dev libopus-dev libsnappy-dev \
+    libvorbis-dev libvpx-dev libx264-dev libx265-dev
+EOF
 
-RUN bundle config set --local deployment 'true' && \
-    bundle config set --global frozen "true" && \
-    bundle config set --global cache_all "false" && \
-    bundle config set --local without 'development test' && \
-    bundle config set silence_root_warning true && \
-    bundle install -j"$(nproc)"
+RUN <<EOF
+set -e
+bundle config set --local deployment 'true'
+bundle config set --global frozen "true"
+bundle config set --global cache_all "false"
+bundle config set --local without 'development test'
+bundle config set silence_root_warning true
+bundle install -j"$(nproc)"
+EOF
 
-RUN corepack enable && \
-    yarn workspaces focus --all --production && \
-    yarn install --network-timeout 600000 
+RUN <<EOF
+set -e
+corepack enable
+yarn workspaces focus --all --production
+yarn install --network-timeout 600000
+EOF
 
 # -------------------------------------------
 # Libvips
@@ -123,16 +84,21 @@ ARG VIPS_URL=https://github.com/libvips/libvips/releases/download
 WORKDIR /usr/local/libvips/src
 # Download and extract libvips source code
 ADD ${VIPS_URL}/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz /usr/local/libvips/src/
-RUN tar xf vips-${VIPS_VERSION}.tar.xz;
+RUN <<EOF
+set -e
+tar xf vips-${VIPS_VERSION}.tar.xz
+EOF
 
 WORKDIR /usr/local/libvips/src/vips-${VIPS_VERSION}
 
 # Configure and compile libvips
-RUN \
-  meson setup build --prefix /usr/local/libvips --libdir=lib -Ddeprecated=false -Dintrospection=disabled -Dmodules=disabled -Dexamples=false; \
-  cd build; \
-  ninja; \
-  ninja install;
+RUN <<EOF
+set -e
+meson setup build --prefix /usr/local/libvips --libdir=lib -Ddeprecated=false -Dintrospection=disabled -Dmodules=disabled -Dexamples=false
+cd build
+ninja
+ninja install
+EOF
 
 # -------------------------------------------
 # ffmpeg
@@ -148,13 +114,18 @@ ARG FFMPEG_URL=https://github.com/FFmpeg/FFmpeg/archive/refs/tags
 WORKDIR /usr/local/ffmpeg/src
 # Download and extract ffmpeg source code
 ADD ${FFMPEG_URL}/n${FFMPEG_VERSION}.tar.gz /usr/local/ffmpeg/src/
-RUN tar xf n${FFMPEG_VERSION}.tar.gz && mv FFmpeg-n${FFMPEG_VERSION} ffmpeg-${FFMPEG_VERSION};
+RUN <<EOF
+set -e
+tar xf n${FFMPEG_VERSION}.tar.gz
+mv FFmpeg-n${FFMPEG_VERSION} ffmpeg-${FFMPEG_VERSION}
+EOF
 
 WORKDIR /usr/local/ffmpeg/src/ffmpeg-${FFMPEG_VERSION}
 
 # Configure and compile ffmpeg
-RUN \
-  ./configure \
+RUN <<EOF
+set -e
+./configure \
   --prefix=/usr/local/ffmpeg \
   --toolchain=hardened \
   --disable-debug \
@@ -176,10 +147,10 @@ RUN \
   --enable-libx264 \
   --enable-libx265 \
   --enable-shared \
-  --enable-version3 \
-  ; \
-  make -j$(nproc); \
-  make install;
+  --enable-version3
+make -j"$(nproc)"
+make install
+EOF
 
 # -------------------------------------------
 # Final image
@@ -224,70 +195,33 @@ COPY --from=ffmpeg /usr/local/ffmpeg/lib /usr/local/lib
 
 # Ignoreing these here since we don't want to pin any versions and the Debian image removes apt-get content after use
 # hadolint ignore=DL3008,DL3009
-RUN apt-get update && \
-    echo "Etc/UTC" > /etc/localtime && \
-    groupadd -g "${GID}" mastodon && \
-    useradd -l -u "$UID" -g "${GID}" -m -d /opt/mastodon mastodon && \
-    apt-get -y --no-install-recommends install whois \
-        curl \
-        wget \
-        procps \
-        libssl3 \
-        libpq5 \
-        imagemagick \
-        ffmpeg \
-        libjemalloc2 \
-        libidn12 \
-        libyaml-0-2 \
-        libvips42 \
-        file \
-        ca-certificates \
-        tzdata \
-        libreadline8 \
-        tini \
-        libexpat1 \
-        libglib2.0-0t64 \
-        libicu76 \
-        libidn12 \
-        libpq5 \
-        libreadline8t64 \
-        libssl3t64 \
-        libyaml-0-2 \
-        # libvips components
-        libcgif0 \
-        libexif12 \
-        libheif1 \
-        libhwy1t64 \
-        libimagequant0 \
-        libjpeg62-turbo \
-        liblcms2-2 \
-        libspng0 \
-        libtiff6 \
-        libwebp7 \
-        libwebpdemux2 \
-        libwebpmux3 \
-        # ffmpeg components
-        libdav1d7 \
-        libmp3lame0 \
-        libopencore-amrnb0 \
-        libopencore-amrwb0 \
-        libopus0 \
-        libsnappy1v5 \
-        libtheora0 \
-        libvorbis0a \
-        libvorbisenc2 \
-        libvorbisfile3 \
-        libvpx9 \
-        libx264-164 \
-        libx265-215 \
-        ;
+RUN <<EOF
+set -e
+apt-get update
+echo "Etc/UTC" > /etc/localtime
+groupadd -g "${GID}" mastodon
+useradd -l -u "$UID" -g "${GID}" -m -d /opt/mastodon mastodon
+apt-get -y --no-install-recommends install \
+    whois curl wget procps libssl3 libpq5 imagemagick ffmpeg \
+    libjemalloc2 libidn12 libyaml-0-2 libvips42 file ca-certificates \
+    tzdata libreadline8 tini libexpat1 libglib2.0-0t64 libicu76 \
+    libidn12 libpq5 libreadline8t64 libssl3t64 libyaml-0-2 \
+    libcgif0 libexif12 libheif1 libhwy1t64 libimagequant0 \
+    libjpeg62-turbo liblcms2-2 libspng0 libtiff6 libwebp7 \
+    libwebpdemux2 libwebpmux3 libdav1d7 libmp3lame0 \
+    libopencore-amrnb0 libopencore-amrwb0 libopus0 libsnappy1v5 \
+    libtheora0 libvorbis0a libvorbisenc2 libvorbisfile3 libvpx9 \
+    libx264-164 libx265-215
+EOF
 
 # Smoketest media processors
-RUN \
-  ldconfig; \
-  vips -v; \
-  ffmpeg -version; \
-  ffprobe -version;
+RUN <<EOF
+set -e
+ldconfig
+vips -v
+ffmpeg -version
+ffprobe -version
+EOF
 
 # Note: no, cleaning here since Debian does this automatically
 # See the file /etc/apt/apt.conf.d/docker-clean within the Docker image's filesystem
@@ -297,26 +231,32 @@ RUN \
 # Set the run user
 WORKDIR /opt/mastodon
 
-RUN \
-    corepack enable && \ 
-    corepack prepare --activate; \
-    yarn workspaces focus --all --production && \
-    ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=precompile_placeholder \
-    ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=precompile_placeholder \
-    ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=precompile_placeholder \
-    OTP_SECRET=precompile_placeholder \
-    SECRET_KEY_BASE=precompile_placeholder \
-    ./bin/rails assets:precompile
+RUN <<EOF
+set -e
+corepack enable
+corepack prepare --activate
+yarn workspaces focus --all --production
+ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=precompile_placeholder \
+ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=precompile_placeholder \
+ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=precompile_placeholder \
+OTP_SECRET=precompile_placeholder \
+SECRET_KEY_BASE=precompile_placeholder \
+./bin/rails assets:precompile
+EOF
 
-RUN \
-    bundle exec bootsnap precompile --gemfile app/ lib/;
+RUN <<EOF
+set -e
+bundle exec bootsnap precompile --gemfile app/ lib/
+EOF
 
-RUN \
-    # Pre-create and chown system volume to Mastodon user
-    mkdir -p /opt/mastodon/public/system && \
-    chown mastodon:mastodon /opt/mastodon/public/system && \
-    # Set Mastodon user as owner of tmp folder
-    chown -R mastodon:mastodon /opt/mastodon
+RUN <<EOF
+set -e
+# Pre-create and chown system volume to Mastodon user
+mkdir -p /opt/mastodon/public/system
+chown mastodon:mastodon /opt/mastodon/public/system
+# Set Mastodon user as owner of tmp folder
+chown -R mastodon:mastodon /opt/mastodon
+EOF
 
 USER mastodon
 
