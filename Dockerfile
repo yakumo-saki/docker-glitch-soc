@@ -2,7 +2,7 @@
 
 # START CONFIG ARGS ------------------------------
 
-ARG NODE_VERSION="lts-trixie-slim"
+ARG NODE_VERSION="krypton-trixie-slim"
 ARG RUBY_YJIT_ENABLE="1"
 
 # Resulting version string is vX.X.X-MASTODON_VERSION_PRERELEASE+MASTODON_VERSION_METADATA
