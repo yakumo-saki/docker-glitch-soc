@@ -37,6 +37,8 @@ Date is in JST (GMT+9)
 
 ## why ?
 
+Repeat. These reasons are old, now you should use official image.
+
 * official dockerfile needs much time to build. (Compiling ruby took long time)
 * Using ruby official image to faster build.
 
