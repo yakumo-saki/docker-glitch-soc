@@ -18,7 +18,7 @@ ARG SOURCE_COMMIT="!!!!!!REPLACE_SOURCE_COMMIT!!!!!!"
 
 
 # get ruby from moritzheiber's jemalloc image
-FROM ghcr.io/moritzheiber/ruby-jemalloc:3.4.4-slim AS ruby
+FROM ghcr.io/moritzheiber/ruby-jemalloc:4.0.9-slim AS ruby
 
 # -------------------------------------------
 # build webpack and assets
