@@ -236,12 +236,7 @@ set -e
 corepack enable
 corepack prepare --activate
 yarn workspaces focus --all --production
-ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=precompile_placeholder \
-ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=precompile_placeholder \
-ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=precompile_placeholder \
-OTP_SECRET=precompile_placeholder \
-SECRET_KEY_BASE=precompile_placeholder \
-./bin/rails assets:precompile
+SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 EOF
 
 RUN <<EOF
