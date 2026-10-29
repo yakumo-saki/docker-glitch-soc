@@ -1,4 +1,3 @@
-[![Build x86 GHA](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml/badge.svg)](https://github.com/yakumo-saki/docker-glitch-soc/actions/workflows/image-build.yml) Build x86 GitHub Action  
 ![AArch64 CircleCI](https://circleci.com/gh/yakumo-saki/docker-glitch-soc.svg?style=shield) Build AArch64 CircleCI  
 
 
@@ -22,6 +21,7 @@ Now supports amd64 and arm64
 
 Date is in JST (GMT+9)
 
+* 2026/10/30 Update Ruby 4.0.9 Node 24
 * 2025/12/21 Add this image is deprecated. and maybe fixed due to wrong multiarch handling
 * 2025/06/xx Unifying aarch64 and amd64 images to yakumosaki/glitch-soc, and amd64 image is broken.
 * 2025/06/14 Update Ruby 3.4.4
